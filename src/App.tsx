@@ -11,11 +11,15 @@ import { StorySection } from './components/story/StorySection';
 import { Footer } from './components/footer/Footer';
 
 export default function App() {
-  const scrollToInteractive = useCallback(() => {
+  const handleIgniteLegend = useCallback(() => {
     const el = document.getElementById('interactive');
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
     }
+    // Launch Rama's divine arrow once scrolled to the canvas
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('launch-divine-arrow'));
+    }, 450);
   }, []);
 
   const scrollToStory = useCallback(() => {
@@ -28,13 +32,13 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#060609] text-[#f7f3ea] flex flex-col selection:bg-amber-500/30 selection:text-amber-200">
       {/* Top Bar Navigation Contract */}
-      <TopBar onIgniteClick={scrollToInteractive} />
+      <TopBar onIgniteClick={handleIgniteLegend} />
 
       {/* Main Page Flow */}
       <main className="flex-1">
         {/* 1. Full-screen Cinematic Hero */}
         <HeroSection 
-          onIgniteClick={scrollToInteractive} 
+          onIgniteClick={handleIgniteLegend} 
           onStoryClick={scrollToStory} 
         />
 

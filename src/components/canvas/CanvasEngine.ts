@@ -54,7 +54,13 @@ export class CanvasEngine {
   private targetY: number = 380;
   private arrowAngle: number = 0;
   private isArrowActive: boolean = false;
-  private bowPull: number = 0; // 0 to 1
+  private bowPull: number = 1.0; // 1 = drawn, 0 = released
+
+  // Lord Rama positioning & stance attributes
+  private ramaX: number = 140;
+  private ramaY: number = 520;
+  private ramaScale: number = 1.0;
+  private stringVibration: number = 0;
 
   // Effigy geometry & burn progression
   private effigyX: number = 550;
@@ -131,26 +137,33 @@ export class CanvasEngine {
 
     // Dynamic placement based on viewport aspect
     const isMobile = this.width < 768;
-    this.effigyScale = Math.min(this.width / 800, this.height / 600) * (isMobile ? 1.05 : 1.15);
-    this.effigyScale = Math.max(0.65, Math.min(1.4, this.effigyScale));
+    this.effigyScale = Math.min(this.width / 880, this.height / 580) * (isMobile ? 0.90 : 1.10);
+    this.effigyScale = Math.max(0.60, Math.min(1.35, this.effigyScale));
 
-    this.effigyX = isMobile ? this.width * 0.5 : this.width * 0.62;
+    this.effigyX = isMobile ? this.width * 0.74 : this.width * 0.68;
     this.effigyY = this.height * 0.88;
 
     // Navel target coordinates
     this.targetX = this.effigyX;
     this.targetY = this.effigyY - 145 * this.effigyScale;
 
-    // Bow origin coordinates
-    this.bowX = isMobile ? this.width * 0.15 : this.width * 0.16;
-    this.bowY = this.height * (isMobile ? 0.82 : 0.72);
+    // Lord Rama positioning (Left side, standing firmly on the ground)
+    this.ramaScale = this.effigyScale * 0.92;
+    this.ramaX = isMobile ? this.width * 0.16 : this.width * 0.18;
+    this.ramaY = this.effigyY;
+
+    // Bow grip position relative to Rama's extended left hand
+    this.bowX = this.ramaX + 44 * this.ramaScale;
+    this.bowY = this.ramaY - 108 * this.ramaScale;
+
+    const dx = this.targetX - this.bowX;
+    const dy = this.targetY - this.bowY;
+    this.arrowAngle = Math.atan2(dy, dx);
 
     if (this.status === 'idle') {
       this.arrowX = this.bowX;
       this.arrowY = this.bowY;
-      const dx = this.targetX - this.bowX;
-      const dy = this.targetY - this.bowY;
-      this.arrowAngle = Math.atan2(dy, dx);
+      this.bowPull = 1.0;
     }
   }
 
@@ -173,7 +186,7 @@ export class CanvasEngine {
     this.reset();
     this.status = 'aiming';
     this.onStatusChange?.('aiming');
-    this.bowPull = 0.85;
+    this.bowPull = 1.0;
     soundSynth.playBowDraw();
   }
 
@@ -184,7 +197,8 @@ export class CanvasEngine {
     }
     this.status = 'flying';
     this.onStatusChange?.('flying');
-    this.bowPull = 1.0;
+    this.bowPull = 0.0; // string snaps forward
+    this.stringVibration = 1.0;
 
     this.arrowX = this.bowX;
     this.arrowY = this.bowY;
@@ -194,10 +208,10 @@ export class CanvasEngine {
     const dx = this.targetX - this.bowX;
     const dy = this.targetY - this.bowY;
     const distance = Math.hypot(dx, dy);
-    const speed = (distance / 42) * this.playbackSpeed; // Takes ~45 frames
+    const speed = (distance / 38) * this.playbackSpeed; // Swift flight
 
     this.arrowVx = (dx / distance) * speed;
-    this.arrowVy = (dy / distance) * speed - 1.5; // slight initial loft
+    this.arrowVy = (dy / distance) * speed - 1.2; // slight loft
     this.arrowAngle = Math.atan2(this.arrowVy, this.arrowVx);
 
     soundSynth.playArrowRelease();
@@ -215,7 +229,8 @@ export class CanvasEngine {
     this.shockwaves = [];
     this.fireworks = [];
     this.isArrowActive = false;
-    this.bowPull = 0;
+    this.bowPull = 1.0; // Rama stands poised with bow drawn
+    this.stringVibration = 0;
     this.arrowX = this.bowX;
     this.arrowY = this.bowY;
     const dx = this.targetX - this.bowX;
@@ -257,26 +272,49 @@ export class CanvasEngine {
       }
     }
 
+    // Decay string vibration
+    if (this.stringVibration > 0) {
+      this.stringVibration = Math.max(0, this.stringVibration - 4.0 * dt);
+    }
+
+    // Subtle golden sparks at arrow tip when poised on Rama's drawn bow
+    if ((this.status === 'idle' || this.status === 'aiming') && Math.random() < 0.28) {
+      const tipDist = 58 * this.ramaScale;
+      const tipX = this.bowX + Math.cos(this.arrowAngle) * tipDist;
+      const tipY = this.bowY + Math.sin(this.arrowAngle) * tipDist;
+      this.particles.push({
+        x: tipX + (Math.random() - 0.5) * 6,
+        y: tipY + (Math.random() - 0.5) * 6,
+        vx: (Math.random() - 0.5) * 1.2,
+        vy: -0.8 - Math.random() * 1.5,
+        size: 1.5 + Math.random() * 2.5,
+        color: Math.random() > 0.4 ? '#fbbf24' : '#ff5722',
+        alpha: 0.85,
+        decay: 0.038,
+        type: 'spark',
+      });
+    }
+
     // 2. Arrow physics in flight
     if (this.status === 'flying' && this.isArrowActive) {
       this.arrowX += this.arrowVx * 60 * dt;
       this.arrowY += this.arrowVy * 60 * dt;
       // Gravity curve
-      this.arrowVy += 0.06 * 60 * dt;
+      this.arrowVy += 0.05 * 60 * dt;
       this.arrowAngle = Math.atan2(this.arrowVy, this.arrowVx);
 
       // Trailing sparks & divine sacred wake
-      const count = Math.floor(4 * this.particleDensityMultiplier);
+      const count = Math.floor(5 * this.particleDensityMultiplier);
       for (let i = 0; i < count; i++) {
         this.particles.push({
-          x: this.arrowX - Math.cos(this.arrowAngle) * (i * 4),
-          y: this.arrowY - Math.sin(this.arrowAngle) * (i * 4),
-          vx: -this.arrowVx * 0.15 + (Math.random() - 0.5) * 1.5,
-          vy: -this.arrowVy * 0.15 + (Math.random() - 0.5) * 1.5,
-          size: 1.5 + Math.random() * 3,
-          color: Math.random() > 0.4 ? '#fbbf24' : '#ff5722',
-          alpha: 0.9,
-          decay: 0.035 + Math.random() * 0.02,
+          x: this.arrowX - Math.cos(this.arrowAngle) * (i * 6),
+          y: this.arrowY - Math.sin(this.arrowAngle) * (i * 6),
+          vx: -this.arrowVx * 0.12 + (Math.random() - 0.5) * 2.0,
+          vy: -this.arrowVy * 0.12 + (Math.random() - 0.5) * 2.0,
+          size: 1.8 + Math.random() * 3.2,
+          color: Math.random() > 0.35 ? '#ffd700' : '#ff5722',
+          alpha: 0.95,
+          decay: 0.03 + Math.random() * 0.02,
           type: 'spark',
         });
       }
@@ -548,8 +586,8 @@ export class CanvasEngine {
     // Draw Ravana Effigy (Dashanana)
     this.drawRavanaEffigy(ctx);
 
-    // Draw Archer & Divine Bow
-    this.drawBowAndArrow(ctx);
+    // Draw Lord Rama and the Divine Kodanda Bow / Arrow
+    this.drawLordRamaAndBow(ctx);
 
     // Draw Particles (Flames, Cracker bursts, Smoke)
     this.drawParticles(ctx);
@@ -872,129 +910,615 @@ export class CanvasEngine {
   }
 
   /**
-   * Draw the Archer and the Divine Flaming Bow / Arrow
+   * Draw Lord Rama in dynamic archer stance on the left side,
+   * holding the Kodanda bow with drawn bowstring and glowing Agneyastra arrow.
    */
-  private drawBowAndArrow(ctx: CanvasRenderingContext2D) {
+  private drawLordRamaAndBow(ctx: CanvasRenderingContext2D) {
     ctx.save();
-    const bx = this.bowX;
-    const by = this.bowY;
-    const s = this.effigyScale;
+    const rx = this.ramaX;
+    const ry = this.ramaY;
+    const rs = this.ramaScale;
 
-    // Archer silhouette in the corner (Shri Rama drawing the bow)
-    ctx.fillStyle = '#0a0a14';
+    // Anchor at Rama's feet on the ground
+    ctx.translate(rx, ry);
+
+    // 1. Subtle Celestial Prabhamandala (Divine Golden Aura behind Rama's head)
+    const haloX = 0;
+    const haloY = -142 * rs;
+    const haloGrad = ctx.createRadialGradient(haloX, haloY, 8 * rs, haloX, haloY, 44 * rs);
+    haloGrad.addColorStop(0, 'rgba(251, 191, 36, 0.40)');
+    haloGrad.addColorStop(0.5, 'rgba(245, 158, 11, 0.15)');
+    haloGrad.addColorStop(1, 'rgba(245, 158, 11, 0)');
+    ctx.fillStyle = haloGrad;
     ctx.beginPath();
-    ctx.ellipse(bx - 35, by + 40, 22, 55, 0.1, 0, Math.PI * 2);
+    ctx.arc(haloX, haloY, 44 * rs, 0, Math.PI * 2);
     ctx.fill();
 
-    // Archer head with crown/quiver silhouette
+    // 2. Flowing Saffron Cloth (Uttariya / Angavastram billowing back in the wind)
+    ctx.save();
+    const clothGrad = ctx.createLinearGradient(-15 * rs, -120 * rs, -80 * rs, -50 * rs);
+    clothGrad.addColorStop(0, '#ea580c');
+    clothGrad.addColorStop(0.6, '#f97316');
+    clothGrad.addColorStop(1, '#c2410c');
+
+    ctx.fillStyle = clothGrad;
     ctx.beginPath();
-    ctx.arc(bx - 38, by - 22, 14, 0, Math.PI * 2);
+    ctx.moveTo(-8 * rs, -122 * rs); // Left shoulder drape
+    ctx.bezierCurveTo(-35 * rs, -115 * rs, -60 * rs, -95 * rs, -75 * rs, -65 * rs);
+    ctx.bezierCurveTo(-65 * rs, -45 * rs, -45 * rs, -60 * rs, -30 * rs, -75 * rs);
+    ctx.bezierCurveTo(-45 * rs, -85 * rs, -60 * rs, -70 * rs, -68 * rs, -50 * rs);
+    ctx.bezierCurveTo(-50 * rs, -70 * rs, -25 * rs, -85 * rs, -14 * rs, -85 * rs);
+    ctx.closePath();
     ctx.fill();
 
-    // Divine Bow (Kodanda)
+    // Golden embroidered border on the saffron cloth
+    ctx.strokeStyle = '#fbbf24';
+    ctx.lineWidth = 1.8 * rs;
+    ctx.stroke();
+    ctx.restore();
+
+    // 3. Quiver (Tarkash) slung on back with divine arrows
     ctx.save();
-    ctx.translate(bx, by);
+    ctx.translate(-16 * rs, -100 * rs);
+    ctx.rotate(-0.35); // Angled over right shoulder
 
-    // Dynamic rotation towards target
-    const angleToTarget = Math.atan2(this.targetY - by, this.targetX - bx);
-    ctx.rotate(angleToTarget);
+    // Quiver body
+    const quiverGrad = ctx.createLinearGradient(0, 0, 14 * rs, 55 * rs);
+    quiverGrad.addColorStop(0, '#854d0e');
+    quiverGrad.addColorStop(0.5, '#b45309');
+    quiverGrad.addColorStop(1, '#451a03');
+    ctx.fillStyle = quiverGrad;
+    ctx.fillRect(-6 * rs, -20 * rs, 13 * rs, 55 * rs);
+    ctx.strokeStyle = '#fbbf24';
+    ctx.lineWidth = 1.5 * rs;
+    ctx.strokeRect(-6 * rs, -20 * rs, 13 * rs, 55 * rs);
 
-    // Bow stave (Ornate golden arc)
+    // Peacock-fletched golden arrows protruding
+    for (let i = -1; i <= 2; i++) {
+      const arrX = i * 3 * rs;
+      ctx.strokeStyle = '#fef08a';
+      ctx.lineWidth = 1.5 * rs;
+      ctx.beginPath();
+      ctx.moveTo(arrX, -20 * rs);
+      ctx.lineTo(arrX - 3 * rs, -36 * rs);
+      ctx.stroke();
+
+      // Peacock green & gold fletching feathers
+      ctx.fillStyle = i % 2 === 0 ? '#0d9488' : '#fbbf24';
+      ctx.beginPath();
+      ctx.moveTo(arrX - 3 * rs, -36 * rs);
+      ctx.lineTo(arrX - 6 * rs, -32 * rs);
+      ctx.lineTo(arrX, -28 * rs);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.restore();
+
+    // 4. Archer Stance Legs (Pratyalidha asana - front bent, rear braced)
+    // Blue-toned skin with muscle shading
+    const skinColor = '#356494';
+    const skinShadow = '#1e3d61';
+    const skinHighlight = '#6ba3d6';
+    const rimGold = '#fde047';
+
+    // Rear Leg (Left leg stepping firmly backwards)
+    ctx.strokeStyle = skinShadow;
+    ctx.lineWidth = 12 * rs;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(-10 * rs, -65 * rs); // Hip
+    ctx.lineTo(-26 * rs, -32 * rs); // Knee
+    ctx.lineTo(-36 * rs, -2 * rs);  // Ankle
+    ctx.stroke();
+
+    ctx.strokeStyle = skinColor;
+    ctx.lineWidth = 9 * rs;
+    ctx.beginPath();
+    ctx.moveTo(-10 * rs, -65 * rs);
+    ctx.lineTo(-26 * rs, -32 * rs);
+    ctx.lineTo(-36 * rs, -2 * rs);
+    ctx.stroke();
+
+    // Rear foot planted firmly on ground
+    ctx.fillStyle = skinColor;
+    ctx.beginPath();
+    ctx.ellipse(-38 * rs, 0, 7 * rs, 3.5 * rs, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Golden anklet (Nupura)
+    ctx.fillStyle = '#fbbf24';
+    ctx.fillRect(-41 * rs, -4 * rs, 8 * rs, 2.5 * rs);
+
+    // Front Leg (Right leg stepped forward, knee dynamically flexed)
+    ctx.strokeStyle = skinShadow;
+    ctx.lineWidth = 13 * rs;
+    ctx.beginPath();
+    ctx.moveTo(8 * rs, -65 * rs);  // Hip
+    ctx.lineTo(26 * rs, -36 * rs); // Knee bent forward
+    ctx.lineTo(24 * rs, -2 * rs);  // Shin
+    ctx.stroke();
+
+    ctx.strokeStyle = skinColor;
+    ctx.lineWidth = 10 * rs;
+    ctx.beginPath();
+    ctx.moveTo(8 * rs, -65 * rs);
+    ctx.lineTo(26 * rs, -36 * rs);
+    ctx.lineTo(24 * rs, -2 * rs);
+    ctx.stroke();
+
+    // Golden rim light on front knee/shin
+    ctx.strokeStyle = rimGold;
+    ctx.lineWidth = 2 * rs;
+    ctx.beginPath();
+    ctx.moveTo(28 * rs, -42 * rs);
+    ctx.lineTo(30 * rs, -34 * rs);
+    ctx.lineTo(28 * rs, -4 * rs);
+    ctx.stroke();
+
+    // Front foot planted
+    ctx.fillStyle = skinColor;
+    ctx.beginPath();
+    ctx.ellipse(26 * rs, 0, 9 * rs, 4 * rs, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Golden anklet
+    ctx.fillStyle = '#fbbf24';
+    ctx.fillRect(21 * rs, -4 * rs, 9 * rs, 2.5 * rs);
+
+    // Royal Traditional Dhoti (Pitambara - Golden silk with ornate pleats)
+    const dhotiGrad = ctx.createLinearGradient(-30 * rs, -70 * rs, 30 * rs, -25 * rs);
+    dhotiGrad.addColorStop(0, '#b45309');
+    dhotiGrad.addColorStop(0.4, '#d97706');
+    dhotiGrad.addColorStop(0.8, '#f59e0b');
+    dhotiGrad.addColorStop(1, '#fbbf24');
+
+    ctx.fillStyle = dhotiGrad;
+    ctx.beginPath();
+    ctx.moveTo(-16 * rs, -72 * rs);
+    ctx.lineTo(16 * rs, -72 * rs);
+    ctx.lineTo(32 * rs, -38 * rs); // Over front thigh
+    ctx.lineTo(16 * rs, -28 * rs); // Center pleats
+    ctx.lineTo(-8 * rs, -30 * rs);
+    ctx.lineTo(-28 * rs, -42 * rs); // Over rear thigh
+    ctx.closePath();
+    ctx.fill();
+
+    // Decorative pleat folds (kachha style)
+    ctx.strokeStyle = '#78350f';
+    ctx.lineWidth = 1.5 * rs;
+    ctx.beginPath();
+    ctx.moveTo(0, -70 * rs);
+    ctx.lineTo(2 * rs, -30 * rs);
+    ctx.moveTo(8 * rs, -68 * rs);
+    ctx.lineTo(12 * rs, -32 * rs);
+    ctx.moveTo(-6 * rs, -68 * rs);
+    ctx.lineTo(-8 * rs, -34 * rs);
+    ctx.stroke();
+
+    // Crimson and gold embroidered border along dhoti hem
+    ctx.strokeStyle = '#dc2626';
+    ctx.lineWidth = 2.5 * rs;
+    ctx.beginPath();
+    ctx.moveTo(-28 * rs, -42 * rs);
+    ctx.lineTo(-8 * rs, -30 * rs);
+    ctx.lineTo(16 * rs, -28 * rs);
+    ctx.lineTo(32 * rs, -38 * rs);
+    ctx.stroke();
+
+    ctx.strokeStyle = '#fef08a';
+    ctx.lineWidth = 1.2 * rs;
+    ctx.stroke();
+
+    // Golden Waistband / Belt (Kamarbandh)
+    ctx.fillStyle = '#f59e0b';
+    ctx.fillRect(-16 * rs, -74 * rs, 32 * rs, 6 * rs);
+    ctx.strokeStyle = '#ffd700';
+    ctx.lineWidth = 1.5 * rs;
+    ctx.strokeRect(-16 * rs, -74 * rs, 32 * rs, 6 * rs);
+    // Ruby medallion at center of belt
+    ctx.fillStyle = '#dc2626';
+    ctx.beginPath();
+    ctx.arc(0, -71 * rs, 3.5 * rs, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 5. Muscular Torso & Chest (Shyama Varna blue-toned skin)
+    ctx.fillStyle = skinColor;
+    ctx.beginPath();
+    ctx.moveTo(-16 * rs, -126 * rs); // Rear shoulder
+    ctx.lineTo(18 * rs, -126 * rs);  // Front shoulder
+    ctx.lineTo(12 * rs, -74 * rs);   // Front waist
+    ctx.lineTo(-12 * rs, -74 * rs);  // Rear waist
+    ctx.closePath();
+    ctx.fill();
+
+    // Muscular chest contour (Pectorals & Latissimus)
+    ctx.strokeStyle = skinShadow;
+    ctx.lineWidth = 2 * rs;
+    ctx.beginPath();
+    ctx.moveTo(0, -120 * rs);
+    ctx.lineTo(0, -85 * rs); // Sternum / abdominal line
+    ctx.moveTo(-10 * rs, -108 * rs);
+    ctx.quadraticCurveTo(0, -102 * rs, 10 * rs, -108 * rs); // Pectoral curve
+    ctx.stroke();
+
+    // Subtle golden rim light along front chest contour
+    ctx.strokeStyle = rimGold;
+    ctx.lineWidth = 2.2 * rs;
+    ctx.beginPath();
+    ctx.moveTo(17 * rs, -124 * rs);
+    ctx.lineTo(14 * rs, -95 * rs);
+    ctx.lineTo(12 * rs, -74 * rs);
+    ctx.stroke();
+
+    // Sacred Thread (Yajnopavita) running diagonally from left shoulder to right waist
+    ctx.strokeStyle = '#fef08a';
+    ctx.lineWidth = 1.5 * rs;
+    ctx.beginPath();
+    ctx.moveTo(-10 * rs, -125 * rs);
+    ctx.quadraticCurveTo(2 * rs, -100 * rs, 10 * rs, -74 * rs);
+    ctx.stroke();
+
+    // Golden Royal Necklace (Kanthahara)
     ctx.strokeStyle = '#f59e0b';
-    ctx.lineWidth = 5 * s;
+    ctx.lineWidth = 3.5 * rs;
+    ctx.beginPath();
+    ctx.arc(0, -122 * rs, 12 * rs, 0.2, Math.PI - 0.2);
+    ctx.stroke();
+    // Ruby gemstones on necklace
+    ctx.fillStyle = '#dc2626';
+    ctx.beginPath();
+    ctx.arc(0, -110 * rs, 2.5 * rs, 0, Math.PI * 2);
+    ctx.arc(-7 * rs, -114 * rs, 2 * rs, 0, Math.PI * 2);
+    ctx.arc(7 * rs, -114 * rs, 2 * rs, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 6. Right Arm (Drawing Hand - Pulled Backward to Cheek)
+    const drawElbowX = -36 * rs;
+    const drawElbowY = -116 * rs;
+    const isDrawn = this.bowPull > 0.1;
+    const stringHandX = isDrawn ? -3 * rs : -18 * rs;
+    const stringHandY = isDrawn ? -136 * rs : -130 * rs;
+
+    // Upper arm pulled back
+    ctx.strokeStyle = skinColor;
+    ctx.lineWidth = 8.5 * rs;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(-14 * rs, -124 * rs);
+    ctx.lineTo(drawElbowX, drawElbowY);
+    ctx.lineTo(stringHandX, stringHandY);
+    ctx.stroke();
+
+    // Golden armlet (Keyura) on right bicep
+    ctx.fillStyle = '#fbbf24';
+    ctx.fillRect(-27 * rs, -124 * rs, 6 * rs, 4 * rs);
+
+    // Golden archery bracer on right forearm
+    ctx.fillStyle = '#f59e0b';
+    ctx.fillRect(-22 * rs, -132 * rs, 8 * rs, 4 * rs);
+
+    // Drawing hand fingers at cheek
+    ctx.fillStyle = skinColor;
+    ctx.beginPath();
+    ctx.arc(stringHandX, stringHandY, 4 * rs, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 7. Head, Hair, Tilak & Traditional Golden Crown (Kiritamukuta)
+    const headX = 0;
+    const headY = -142 * rs;
+    const headRadius = 13 * rs;
+
+    // Neck
+    ctx.fillStyle = skinColor;
+    ctx.beginPath();
+    ctx.moveTo(-6 * rs, -128 * rs);
+    ctx.lineTo(6 * rs, -128 * rs);
+    ctx.lineTo(5 * rs, -136 * rs);
+    ctx.lineTo(-5 * rs, -136 * rs);
+    ctx.closePath();
+    ctx.fill();
+
+    // Face / Head profile (facing right toward Ravana)
+    ctx.fillStyle = skinColor;
+    ctx.beginPath();
+    ctx.arc(headX, headY, headRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Noble jawline & nose in profile facing right (+x)
+    ctx.beginPath();
+    ctx.moveTo(headX + 4 * rs, headY - 8 * rs); // Forehead
+    ctx.lineTo(headX + 13 * rs, headY - 1 * rs); // Aquiline nose tip
+    ctx.lineTo(headX + 7 * rs, headY + 3 * rs);  // Upper lip
+    ctx.lineTo(headX + 8 * rs, headY + 6 * rs);  // Lower lip
+    ctx.lineTo(headX + 6 * rs, headY + 11 * rs); // Chin
+    ctx.lineTo(headX - 4 * rs, headY + 12 * rs); // Jaw
+    ctx.closePath();
+    ctx.fill();
+
+    // Golden rim light along profile
+    ctx.strokeStyle = rimGold;
+    ctx.lineWidth = 1.6 * rs;
+    ctx.beginPath();
+    ctx.moveTo(headX + 6 * rs, headY - 7 * rs);
+    ctx.lineTo(headX + 13 * rs, headY - 1 * rs);
+    ctx.lineTo(headX + 8 * rs, headY + 6 * rs);
+    ctx.lineTo(headX + 6 * rs, headY + 11 * rs);
+    ctx.stroke();
+
+    // Determined, serene lotus-petal eye looking right
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.ellipse(headX + 4 * rs, headY - 2 * rs, 3.2 * rs, 1.8 * rs, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Iris with golden gleam
+    ctx.fillStyle = '#0f172a';
+    ctx.beginPath();
+    ctx.arc(headX + 5 * rs, headY - 2 * rs, 1.5 * rs, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#fef08a';
+    ctx.beginPath();
+    ctx.arc(headX + 5.5 * rs, headY - 2.5 * rs, 0.6 * rs, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Sacred Vaishnavite Urdhva Pundra Tilak on forehead
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1.5 * rs;
+    ctx.beginPath();
+    ctx.moveTo(headX + 4 * rs, headY - 9 * rs);
+    ctx.lineTo(headX + 6 * rs, headY - 5 * rs);
+    ctx.stroke();
+    // Red vermilion bindu in center of Tilak
+    ctx.fillStyle = '#dc2626';
+    ctx.beginPath();
+    ctx.arc(headX + 5 * rs, headY - 7 * rs, 1.3 * rs, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Hair topknot & tresses behind crown
+    ctx.fillStyle = '#0f172a';
+    ctx.beginPath();
+    ctx.arc(headX - 6 * rs, headY - 7 * rs, 8 * rs, 0, Math.PI * 2);
+    ctx.fill();
+    // Flowing hair strands at neck
+    ctx.beginPath();
+    ctx.moveTo(headX - 8 * rs, headY + 4 * rs);
+    ctx.quadraticCurveTo(-14 * rs, headY + 12 * rs, -12 * rs, headY + 22 * rs);
+    ctx.lineTo(-7 * rs, headY + 14 * rs);
+    ctx.closePath();
+    ctx.fill();
+
+    // Golden Kundala (earring)
+    ctx.fillStyle = '#fbbf24';
+    ctx.beginPath();
+    ctx.arc(headX - 2 * rs, headY + 4 * rs, 2.5 * rs, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Traditional Golden Crown (Kiritamukuta)
+    const crownGrad = ctx.createLinearGradient(headX - 10 * rs, headY - 14 * rs, headX + 10 * rs, headY - 40 * rs);
+    crownGrad.addColorStop(0, '#d97706');
+    crownGrad.addColorStop(0.5, '#f59e0b');
+    crownGrad.addColorStop(1, '#ffd700');
+
+    ctx.fillStyle = crownGrad;
+    ctx.beginPath();
+    ctx.moveTo(headX - 10 * rs, headY - 9 * rs);
+    ctx.lineTo(headX - 8 * rs, headY - 28 * rs);
+    ctx.lineTo(headX + 2 * rs, headY - 42 * rs); // Conical finial pinnacle
+    ctx.lineTo(headX + 8 * rs, headY - 26 * rs);
+    ctx.lineTo(headX + 8 * rs, headY - 9 * rs);
+    ctx.closePath();
+    ctx.fill();
+
+    // Crown engravings & solar emblem
+    ctx.strokeStyle = '#fffbeb';
+    ctx.lineWidth = 1.5 * rs;
+    ctx.stroke();
+
+    // Ruby crest at center of crown
+    ctx.fillStyle = '#dc2626';
+    ctx.beginPath();
+    ctx.arc(headX, headY - 22 * rs, 3.2 * rs, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#fbbf24';
+    ctx.lineWidth = 1 * rs;
+    ctx.stroke();
+
+    // Crown pinnacle golden aura pearl
+    ctx.fillStyle = '#fef08a';
+    ctx.beginPath();
+    ctx.arc(headX + 2 * rs, headY - 43 * rs, 2 * rs, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 8. Left Arm (Extended Forward to Bow Grip)
+    const bowGripX = 44 * rs;
+    const bowGripY = -108 * rs;
+    ctx.strokeStyle = skinColor;
+    ctx.lineWidth = 9 * rs;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(14 * rs, -124 * rs); // Shoulder
+    ctx.lineTo(30 * rs, -118 * rs); // Elbow
+    ctx.lineTo(bowGripX, bowGripY);  // Hand on bow
+    ctx.stroke();
+
+    // Golden rim light on left arm
+    ctx.strokeStyle = rimGold;
+    ctx.lineWidth = 1.8 * rs;
+    ctx.beginPath();
+    ctx.moveTo(16 * rs, -127 * rs);
+    ctx.lineTo(32 * rs, -121 * rs);
+    ctx.lineTo(bowGripX, bowGripY - 2 * rs);
+    ctx.stroke();
+
+    // Golden Armlet (Keyura) on left bicep
+    ctx.fillStyle = '#fbbf24';
+    ctx.fillRect(21 * rs, -123 * rs, 6 * rs, 4 * rs);
+
+    // Golden Archery Bracer on left forearm
+    ctx.fillStyle = '#f59e0b';
+    ctx.fillRect(34 * rs, -118 * rs, 8 * rs, 4 * rs);
+
+    // Left hand gripping the center of the Kodanda bow
+    ctx.fillStyle = skinColor;
+    ctx.beginPath();
+    ctx.arc(bowGripX, bowGripY, 4.5 * rs, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 9. Divine Kodanda Bow & Taut Bowstring
+    ctx.save();
+    ctx.translate(bowGripX, bowGripY);
+    ctx.rotate(this.arrowAngle);
+
+    // Ornate Golden Bow Stave (Kodanda)
+    ctx.strokeStyle = '#f59e0b';
+    ctx.lineWidth = 5 * rs;
     ctx.shadowColor = 'rgba(251, 191, 36, 0.7)';
     ctx.shadowBlur = 12;
 
     ctx.beginPath();
-    ctx.arc(0, 0, 52 * s, -Math.PI * 0.42, Math.PI * 0.42);
+    ctx.arc(0, 0, 56 * rs, -Math.PI * 0.44, Math.PI * 0.44);
     ctx.stroke();
 
-    // Bowstring drawn taut with pull factor
-    const pullX = -this.bowPull * (28 * s);
-    ctx.strokeStyle = '#fef08a';
-    ctx.lineWidth = 1.5;
-    ctx.shadowBlur = 4;
+    // Golden recurve makara tips on bow
+    ctx.fillStyle = '#ffd700';
     ctx.beginPath();
-    ctx.moveTo(35 * s, -38 * s);
-    ctx.lineTo(pullX, 0);
-    ctx.lineTo(35 * s, 38 * s);
+    ctx.arc(38 * rs, -41 * rs, 4 * rs, 0, Math.PI * 2);
+    ctx.arc(38 * rs, 41 * rs, 4 * rs, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Bow grip wrap
+    ctx.fillStyle = '#b45309';
+    ctx.fillRect(-3 * rs, -8 * rs, 6 * rs, 16 * rs);
+    ctx.strokeStyle = '#fef08a';
+    ctx.lineWidth = 1.2 * rs;
+    ctx.strokeRect(-3 * rs, -8 * rs, 6 * rs, 16 * rs);
+
+    // Taut Bowstring
+    const topTipX = 38 * rs;
+    const topTipY = -41 * rs;
+    const bottomTipX = 38 * rs;
+    const bottomTipY = 41 * rs;
+
+    // Draw string apex
+    let apexX = 0;
+    let apexY = 0;
+    if (isDrawn) {
+      // Pulled taut backward along arrow axis to cheek
+      const pullDist = 32 * rs * this.bowPull;
+      apexX = -pullDist;
+      apexY = 0;
+    } else {
+      // Released string with decaying vibration
+      const vib = Math.sin(Date.now() * 0.08) * this.stringVibration * 3 * rs;
+      apexX = 18 * rs + vib;
+      apexY = 0;
+    }
+
+    ctx.strokeStyle = '#fef08a';
+    ctx.lineWidth = 1.8;
+    ctx.shadowBlur = 5;
+    ctx.beginPath();
+    ctx.moveTo(topTipX, topTipY);
+    ctx.lineTo(apexX, apexY);
+    ctx.lineTo(bottomTipX, bottomTipY);
     ctx.stroke();
 
-    // Divine arrow sitting in bow (when idle or aiming)
+    // 10. Divine Arrow (Agneyastra / Brahmashira) poised on bow
     if (this.status === 'idle' || this.status === 'aiming') {
-      const arrowStartX = pullX;
-      const arrowLength = 70 * s;
+      const arrowStartX = apexX;
+      const arrowLength = 72 * rs;
 
-      // Shaft
+      // Golden Shaft
       ctx.strokeStyle = '#ffd700';
-      ctx.lineWidth = 2.5 * s;
+      ctx.lineWidth = 2.8 * rs;
+      ctx.shadowColor = '#f59e0b';
+      ctx.shadowBlur = 10;
       ctx.beginPath();
       ctx.moveTo(arrowStartX, 0);
       ctx.lineTo(arrowStartX + arrowLength, 0);
       ctx.stroke();
 
-      // Flaming arrowhead
-      ctx.fillStyle = '#ff5722';
+      // Golden arrow fletching at nock
+      ctx.fillStyle = '#fef08a';
       ctx.beginPath();
-      ctx.moveTo(arrowStartX + arrowLength, -5 * s);
-      ctx.lineTo(arrowStartX + arrowLength + 14 * s, 0);
-      ctx.lineTo(arrowStartX + arrowLength, 5 * s);
+      ctx.moveTo(arrowStartX, 0);
+      ctx.lineTo(arrowStartX - 6 * rs, -4 * rs);
+      ctx.lineTo(arrowStartX - 4 * rs, 0);
+      ctx.lineTo(arrowStartX - 6 * rs, 4 * rs);
       ctx.closePath();
       ctx.fill();
 
-      // Flame glow
-      if (this.status === 'aiming') {
-        const flamePulse = 1 + Math.sin(Date.now() * 0.015) * 0.3;
-        ctx.fillStyle = 'rgba(255, 87, 34, 0.5)';
-        ctx.beginPath();
-        ctx.arc(arrowStartX + arrowLength + 8 * s, 0, 16 * s * flamePulse, 0, Math.PI * 2);
-        ctx.fill();
-      }
+      // Trident / Agneyastra flaming arrowhead
+      const tipX = arrowStartX + arrowLength;
+      ctx.fillStyle = '#ff5722';
+      ctx.beginPath();
+      ctx.moveTo(tipX, -6 * rs);
+      ctx.lineTo(tipX + 16 * rs, 0);
+      ctx.lineTo(tipX, 6 * rs);
+      ctx.closePath();
+      ctx.fill();
+
+      // Pulsing flame halo at arrowhead
+      const pulse = 1 + Math.sin(Date.now() * 0.012) * 0.25;
+      const flameGlow = ctx.createRadialGradient(tipX + 8 * rs, 0, 2 * rs, tipX + 8 * rs, 0, 22 * rs * pulse);
+      flameGlow.addColorStop(0, 'rgba(255, 235, 59, 1)');
+      flameGlow.addColorStop(0.5, 'rgba(255, 87, 34, 0.7)');
+      flameGlow.addColorStop(1, 'rgba(255, 87, 34, 0)');
+      ctx.fillStyle = flameGlow;
+      ctx.beginPath();
+      ctx.arc(tipX + 8 * rs, 0, 22 * rs * pulse, 0, Math.PI * 2);
+      ctx.fill();
     }
 
-    ctx.restore();
+    ctx.restore(); // Bow local space
+    ctx.restore(); // Rama local space
 
-    // Flaming Arrow in flight
+    // 11. Flaming Arrow in Flight across the sky toward Ravana
     if (this.status === 'flying' && this.isArrowActive) {
       ctx.save();
       ctx.translate(this.arrowX, this.arrowY);
       ctx.rotate(this.arrowAngle);
 
-      const aLen = 65 * s;
+      const aLen = 68 * rs;
 
       // Golden shaft
       ctx.strokeStyle = '#ffd700';
-      ctx.lineWidth = 3 * s;
+      ctx.lineWidth = 3.2 * rs;
       ctx.shadowColor = '#f59e0b';
-      ctx.shadowBlur = 15;
+      ctx.shadowBlur = 18;
       ctx.beginPath();
       ctx.moveTo(-aLen, 0);
       ctx.lineTo(0, 0);
       ctx.stroke();
 
-      // Arrowhead
+      // Arrow fletching
+      ctx.fillStyle = '#fef08a';
+      ctx.beginPath();
+      ctx.moveTo(-aLen, 0);
+      ctx.lineTo(-aLen - 8 * rs, -5 * rs);
+      ctx.lineTo(-aLen - 5 * rs, 0);
+      ctx.lineTo(-aLen - 8 * rs, 5 * rs);
+      ctx.closePath();
+      ctx.fill();
+
+      // Agneyastra Arrowhead
       ctx.fillStyle = '#ff3d00';
       ctx.beginPath();
-      ctx.moveTo(0, -6 * s);
-      ctx.lineTo(16 * s, 0);
-      ctx.lineTo(0, 6 * s);
+      ctx.moveTo(0, -7 * rs);
+      ctx.lineTo(18 * rs, 0);
+      ctx.lineTo(0, 7 * rs);
       ctx.closePath();
       ctx.fill();
 
       // Blazing halo around head
-      const glow = ctx.createRadialGradient(8 * s, 0, 2 * s, 8 * s, 0, 24 * s);
+      const glow = ctx.createRadialGradient(8 * rs, 0, 2 * rs, 8 * rs, 0, 26 * rs);
       glow.addColorStop(0, 'rgba(255, 235, 59, 1)');
-      glow.addColorStop(0.5, 'rgba(255, 87, 34, 0.8)');
+      glow.addColorStop(0.4, 'rgba(255, 87, 34, 0.85)');
       glow.addColorStop(1, 'rgba(255, 87, 34, 0)');
       ctx.fillStyle = glow;
       ctx.beginPath();
-      ctx.arc(8 * s, 0, 24 * s, 0, Math.PI * 2);
+      ctx.arc(8 * rs, 0, 26 * rs, 0, Math.PI * 2);
       ctx.fill();
 
       ctx.restore();
     }
-
-    ctx.restore();
   }
 
   /**

@@ -138,25 +138,36 @@ export const RavanaCanvas: React.FC<RavanaCanvasProps> = ({ onInteraction }) => 
     }
   }, [status, handleLaunchArrow, handleReset]);
 
+  // Handle remote event trigger (e.g. from "IGNITE THE LEGEND" button)
+  useEffect(() => {
+    const handleRemoteLaunch = () => {
+      handleLaunchArrow();
+    };
+    window.addEventListener('launch-divine-arrow', handleRemoteLaunch);
+    return () => {
+      window.removeEventListener('launch-divine-arrow', handleRemoteLaunch);
+    };
+  }, [handleLaunchArrow]);
+
   // Status badge text
   const getStatusDisplay = () => {
     switch (status) {
       case 'idle':
-        return { label: 'Effigy Poised', desc: 'Click to loose the Agneyastra arrow' };
+        return { label: 'Lord Rama Poised', desc: 'Bowstring drawn; click canvas or button to loose Agneyastra' };
       case 'aiming':
-        return { label: 'Bow Drawn', desc: 'Aligning with the sacred Amrit Kund' };
+        return { label: 'Lord Rama Aiming', desc: 'Aligning with the sacred Amrit Kund in Ravana’s navel' };
       case 'flying':
-        return { label: 'Arrow in Flight', desc: 'Brahmashira soaring across the twilight' };
+        return { label: 'Agneyastra in Flight', desc: 'Divine fire arrow soaring toward Ravana with sparkling trail' };
       case 'impact':
-        return { label: 'Amrit Kund Pierced', desc: 'Divine strike dissolves the vessel of hubris' };
+        return { label: 'Amrit Kund Pierced', desc: 'Divine strike shatters the nectar vessel of ego' };
       case 'burning':
-        return { label: 'Sacred Agni Roars', desc: 'Flame spreads through bamboo and gold robes' };
+        return { label: 'Sacred Agni Roars', desc: 'Flame consumes bamboo armature and royal vestments' };
       case 'exploding':
         return { label: 'Effigy Conflagration', desc: 'Ten heads bursting into radiant firecrackers' };
       case 'concluded':
         return { label: 'Dharma Victorious', desc: 'The effigy turns to sacred ash; light prevails' };
       default:
-        return { label: 'Standing Tall', desc: '' };
+        return { label: 'Lord Rama Poised', desc: '' };
     }
   };
 
