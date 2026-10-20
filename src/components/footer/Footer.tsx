@@ -17,42 +17,42 @@ export const Footer: React.FC = () => {
         {/* Minimal Required Statement */}
         <div className="space-y-2 max-w-xl">
           <h3 className="font-cinzel text-lg sm:text-xl font-bold tracking-wider text-white">
-            RAVANA DAHAN
+            রাবণ দহন
           </h3>
           <p className="text-amber-200/90 text-sm sm:text-base font-cinzel italic tracking-wide">
-            &ldquo;Celebrating the eternal victory of light over darkness.&rdquo;
+            &ldquo;আলোর জয় হোক, অন্ধকারের বিনাশ হোক।&rdquo;
           </p>
           <p className="text-xs text-neutral-400 font-sans pt-1">
-            May the sacred flames consume our inner doubts and awaken righteousness, truth, and peace in every heart.
+            পবিত্র অগ্নিশিখা আমাদের অন্তরের সমস্ত অন্ধকার ও সংশয় দূর করে সবার হৃদয়ে সত্য, ন্যায় ও শান্তির আলো জ্বালিয়ে তুলুক।
           </p>
         </div>
 
         {/* Footer Navigation Mirror & Return to Top */}
         <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-neutral-400 pt-4 border-t border-neutral-900 w-full max-w-lg">
           <a href="#hero" className="hover:text-amber-400 transition-colors">
-            The Legend
+            পৌরাণিক কথা
           </a>
           <span>·</span>
           <a href="#interactive" className="hover:text-amber-400 transition-colors">
-            Interactive Dahan
+            ঐতিহ্যবাহী দহন
           </a>
           <span>·</span>
           <a href="#vices" className="hover:text-amber-400 transition-colors">
-            The Ten Vices
+            দশ রিপু
           </a>
           <span>·</span>
           <button
             onClick={scrollToTop}
             className="hover:text-amber-300 transition-colors flex items-center gap-1 cursor-pointer"
-            aria-label="Scroll back to top"
+            aria-label="পৃষ্ঠার শীর্ষে ফিরে যান"
           >
-            <span>Back to top</span>
+            <span>উপরে উঠুন</span>
             <ArrowUp className="w-3.5 h-3.5" />
           </button>
         </div>
 
         <div className="text-[11px] text-neutral-400/80 font-sans tracking-wide">
-          Shubh Vijayadashami · Dussehra Festival Edition
+          শুভ বিজয়াদশমী · আলোর মহোৎসব
         </div>
       </div>
     </footer>

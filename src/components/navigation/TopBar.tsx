@@ -9,10 +9,10 @@ export const TopBar: React.FC<TopBarProps> = ({ onIgniteClick }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [
-    { label: 'The Legend', href: '#hero' },
-    { label: 'Interactive Dahan', href: '#interactive' },
-    { label: 'The Ten Vices', href: '#vices' },
-    { label: 'Festival Lore', href: '#story' },
+    { label: 'পৌরাণিক কথা', href: '#hero' },
+    { label: 'ঐতিহ্যবাহী দহন', href: '#interactive' },
+    { label: 'দশ রিপু', href: '#vices' },
+    { label: 'উৎসবের মহিমা', href: '#story' },
   ];
 
   const handleLinkClick = (href: string) => {
@@ -29,10 +29,10 @@ export const TopBar: React.FC<TopBarProps> = ({ onIgniteClick }) => {
         {/* Zone 1: Single text element wordmark */}
         <a 
           href="#hero" 
-          className="text-lg md:text-xl font-cinzel font-bold tracking-widest text-[#fdfbf7] hover:text-amber-400 transition-colors whitespace-nowrap shrink-0 flex items-center gap-2"
+          className="text-lg md:text-xl font-cinzel font-bold tracking-wider text-[#fdfbf7] hover:text-amber-400 transition-colors whitespace-nowrap shrink-0 flex items-center gap-2"
         >
           <span className="text-amber-500 font-black">✦</span>
-          <span>RAVANA DAHAN</span>
+          <span>রাবণ দহন</span>
         </a>
 
         {/* Zone 2: Clean single-line text navigation links */}
@@ -55,14 +55,14 @@ export const TopBar: React.FC<TopBarProps> = ({ onIgniteClick }) => {
             className="hidden sm:flex items-center gap-2 px-5 py-2.5 text-xs font-semibold tracking-wider font-cinzel text-amber-950 bg-gradient-to-r from-amber-400 to-amber-500 rounded-lg hover:from-amber-300 hover:to-amber-400 active:scale-95 transition-all shadow-md shadow-amber-500/20 whitespace-nowrap shrink-0 cursor-pointer"
           >
             <Flame className="w-3.5 h-3.5 text-amber-900 fill-amber-900" />
-            <span>IGNITE EFFIGY</span>
+            <span>অগ্নিবাণ ছোড়ো</span>
           </button>
 
           {/* Mobile hamburger button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden p-2 text-neutral-300 hover:text-amber-400 cursor-pointer"
-            aria-label="Toggle navigation menu"
+            aria-label="Navigation Menu"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -89,7 +89,7 @@ export const TopBar: React.FC<TopBarProps> = ({ onIgniteClick }) => {
             className="mt-2 flex items-center justify-center gap-2 w-full py-3 text-xs font-semibold tracking-wider font-cinzel text-amber-950 bg-gradient-to-r from-amber-400 to-amber-500 rounded-lg shadow-md"
           >
             <Flame className="w-4 h-4 text-amber-900 fill-amber-900" />
-            <span>IGNITE THE LEGEND</span>
+            <span>অগ্নিবাণ ছোড়ো</span>
           </button>
         </div>
       )}

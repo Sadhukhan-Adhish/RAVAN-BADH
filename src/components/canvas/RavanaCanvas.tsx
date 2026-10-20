@@ -50,7 +50,7 @@ export const RavanaCanvas: React.FC<RavanaCanvasProps> = ({ onInteraction }) => 
       setExplodedHeads((prev) => [...prev, headIndex]);
       const vice = TEN_VICES[headIndex];
       if (vice) {
-        setActiveHeadInfo(`Purging: ${vice.sanskritName} — ${vice.englishName}`);
+        setActiveHeadInfo(`বিনাশ হচ্ছে: ${vice.sanskritName} — ${vice.englishName}`);
       }
     });
 
@@ -153,21 +153,21 @@ export const RavanaCanvas: React.FC<RavanaCanvasProps> = ({ onInteraction }) => 
   const getStatusDisplay = () => {
     switch (status) {
       case 'idle':
-        return { label: 'Lord Rama Poised', desc: 'Bowstring drawn; click canvas or button to loose Agneyastra' };
+        return { label: 'শ্রীরামচন্দ্র প্রস্তুত', desc: 'ধনুকের ছিলা টানা রয়েছে; অগ্নিবাণ ছুড়তে ক্লিক করুন' };
       case 'aiming':
-        return { label: 'Lord Rama Aiming', desc: 'Aligning with the sacred Amrit Kund in Ravana’s navel' };
+        return { label: 'লক্ষ্য স্থির হচ্ছে', desc: 'রাবণের নাভিস্থ অমৃত কুণ্ডে দৃষ্টি নিবদ্ধ' };
       case 'flying':
-        return { label: 'Agneyastra in Flight', desc: 'Divine fire arrow soaring toward Ravana with sparkling trail' };
+        return { label: 'অগ্নিবাণ ছুটে চলেছে', desc: 'অন্ধকার চিরে সোনার স্ফুলিঙ্গ ছড়িয়ে এগিয়ে চলেছে দিব্য তীর' };
       case 'impact':
-        return { label: 'Amrit Kund Pierced', desc: 'Divine strike shatters the nectar vessel of ego' };
+        return { label: 'অমৃত কুণ্ড বিদ্ধ', desc: 'তীব্র আঘাতে অহংকারের মায়াপাত্র চূর্ণবিচূর্ণ' };
       case 'burning':
-        return { label: 'Sacred Agni Roars', desc: 'Flame consumes bamboo armature and royal vestments' };
+        return { label: 'প্রজ্বলিত মহাদহন', desc: 'বাঁশ ও পোশাকে দ্রুত ছড়িয়ে পড়ছে লেলিহান অগ্নি' };
       case 'exploding':
-        return { label: 'Effigy Conflagration', desc: 'Ten heads bursting into radiant firecrackers' };
+        return { label: 'মস্তকে মহাবিস্ফোরন', desc: 'দশটি মস্তক থেকে একে একে ফেটে পড়ছে রঙিন আতশবাজি' };
       case 'concluded':
-        return { label: 'Dharma Victorious', desc: 'The effigy turns to sacred ash; light prevails' };
+        return { label: 'সত্যের জয়', desc: 'রাবণের পুতুল ভস্মীভূত; প্রতিষ্ঠিত হলো শাশ্বত ধর্ম' };
       default:
-        return { label: 'Lord Rama Poised', desc: '' };
+        return { label: 'শ্রীরামচন্দ্র প্রস্তুত', desc: '' };
     }
   };
 
@@ -200,9 +200,9 @@ export const RavanaCanvas: React.FC<RavanaCanvasProps> = ({ onInteraction }) => 
         <div className="flex items-center gap-2">
           <button
             onClick={toggleSound}
-            aria-label={isMuted ? 'Unmute festival sounds' : 'Mute festival sounds'}
+            aria-label={isMuted ? 'শব্দ চালু করুন' : 'শব্দ বন্ধ করুন'}
             className="p-2 rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-amber-400 hover:border-amber-700/50 transition-colors cursor-pointer"
-            title={isMuted ? 'Unmute synthesized audio' : 'Mute audio'}
+            title={isMuted ? 'শব্দ চালু করুন' : 'শব্দ বন্ধ করুন'}
           >
             {isMuted ? <VolumeX className="w-4 h-4 text-red-400" /> : <Volume2 className="w-4 h-4 text-amber-400" />}
           </button>
@@ -213,19 +213,19 @@ export const RavanaCanvas: React.FC<RavanaCanvasProps> = ({ onInteraction }) => 
               onClick={() => handleSpeedChange(0.5)}
               className={`px-2 py-1 rounded transition-colors cursor-pointer ${speed === 0.5 ? 'bg-amber-500/20 text-amber-300 font-semibold' : 'hover:text-neutral-200'}`}
             >
-              0.5x
+              ০.৫x
             </button>
             <button
               onClick={() => handleSpeedChange(1.0)}
               className={`px-2 py-1 rounded transition-colors cursor-pointer ${speed === 1.0 ? 'bg-amber-500/20 text-amber-300 font-semibold' : 'hover:text-neutral-200'}`}
             >
-              1.0x
+              ১.০x
             </button>
             <button
               onClick={() => handleSpeedChange(1.5)}
               className={`px-2 py-1 rounded transition-colors cursor-pointer ${speed === 1.5 ? 'bg-amber-500/20 text-amber-300 font-semibold' : 'hover:text-neutral-200'}`}
             >
-              1.5x
+              ১.৫x
             </button>
           </div>
         </div>
@@ -244,9 +244,9 @@ export const RavanaCanvas: React.FC<RavanaCanvasProps> = ({ onInteraction }) => 
 
         {/* Interactive Click to Launch Hint Overlay */}
         {status === 'idle' && (
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full bg-black/60 backdrop-blur-md border border-amber-500/30 text-amber-200 text-xs font-medium tracking-wide flex items-center gap-2 pointer-events-none opacity-90 transition-opacity">
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full bg-black/60 backdrop-blur-md border border-amber-500/30 text-amber-200 text-xs font-medium tracking-wide flex items-center gap-2 pointer-events-none opacity-90 transition-opacity whitespace-nowrap">
             <Crosshair className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
-            <span>Click canvas or press &ldquo;Release Agneyastra&rdquo; to ignite</span>
+            <span>অগ্নিবাণ ছুড়তে ক্যানভাসে বা &ldquo;অগ্নিবাণ ছোড়ো&rdquo; বোতামে ক্লিক করুন</span>
           </div>
         )}
 
@@ -254,13 +254,13 @@ export const RavanaCanvas: React.FC<RavanaCanvasProps> = ({ onInteraction }) => 
         {status === 'concluded' && (
           <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex flex-col items-center justify-center p-6 text-center animate-fade-in pointer-events-none">
             <div className="text-amber-400 text-xs font-semibold tracking-[0.25em] uppercase mb-2">
-              Cosmic Order Restored
+              শাশ্বত ধর্ম প্রতিষ্ঠিত
             </div>
             <div className="font-cinzel text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-wider glow-fire mb-3">
-              DHARMASYA JAYAH
+              ধর্মের জয়
             </div>
             <p className="text-neutral-300 text-sm max-w-md font-sans leading-relaxed">
-              The ten vices dissolve in celestial flames. Truth, righteousness, and humility reign eternal.
+              পবিত্র অগ্নিতে ভস্মীভূত হলো দশটি রিপু। সত্য, ন্যায় ও মানবতার জয় চিরন্তন।
             </p>
           </div>
         )}
@@ -276,7 +276,7 @@ export const RavanaCanvas: React.FC<RavanaCanvasProps> = ({ onInteraction }) => 
             className="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-600 via-orange-600 to-amber-500 text-white font-cinzel font-semibold text-sm tracking-wider shadow-lg shadow-orange-900/40 hover:from-amber-500 hover:to-orange-500 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2.5 cursor-pointer"
           >
             <Flame className="w-4 h-4 text-amber-200" />
-            <span>RELEASE AGNEYASTRA</span>
+            <span>অগ্নিবাণ ছোড়ো</span>
           </button>
 
           <button
@@ -285,7 +285,7 @@ export const RavanaCanvas: React.FC<RavanaCanvasProps> = ({ onInteraction }) => 
             className="px-4 py-3 rounded-xl bg-neutral-900 border border-neutral-700 text-neutral-300 hover:text-white hover:border-amber-600/60 font-medium text-xs tracking-wider transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
           >
             <Crosshair className="w-3.5 h-3.5 text-amber-400" />
-            <span>DRAW BOW</span>
+            <span>ধনুক তোলো</span>
           </button>
 
           <button
@@ -293,14 +293,14 @@ export const RavanaCanvas: React.FC<RavanaCanvasProps> = ({ onInteraction }) => 
             className="px-4 py-3 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-amber-300 hover:border-neutral-700 font-medium text-xs tracking-wider transition-colors flex items-center gap-2 cursor-pointer"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            <span>RESET EFFIGY</span>
+            <span>পুনরায় সাজাও</span>
           </button>
 
           <button
             onClick={togglePlayPause}
             disabled={status === 'idle' || status === 'concluded'}
             className="p-3 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-white transition-colors disabled:opacity-40 cursor-pointer"
-            aria-label={isPaused ? 'Resume simulation' : 'Pause simulation'}
+            aria-label={isPaused ? 'পুনরায় চালু করুন' : 'বিরতি দিন'}
           >
             {isPaused ? <Play className="w-4 h-4 text-emerald-400" /> : <Pause className="w-4 h-4" />}
           </button>
@@ -308,19 +308,19 @@ export const RavanaCanvas: React.FC<RavanaCanvasProps> = ({ onInteraction }) => 
 
         {/* Right: Particle Density Mode */}
         <div className="flex items-center gap-3 text-xs text-neutral-400">
-          <span className="hidden sm:inline">Spark Density:</span>
+          <span className="hidden sm:inline">স্ফুলিঙ্গের ঘনত্ব:</span>
           <div className="flex items-center bg-neutral-900 border border-neutral-800 rounded-lg p-0.5">
             <button
               onClick={() => handleDensityChange('standard')}
               className={`px-3 py-1.5 rounded transition-colors cursor-pointer ${particleDensity === 'standard' ? 'bg-amber-500/20 text-amber-300 font-semibold' : 'text-neutral-400 hover:text-neutral-200'}`}
             >
-              Standard
+              সাধারণ
             </button>
             <button
               onClick={() => handleDensityChange('cinematic')}
               className={`px-3 py-1.5 rounded transition-colors cursor-pointer ${particleDensity === 'cinematic' ? 'bg-amber-500/20 text-amber-300 font-semibold' : 'text-neutral-400 hover:text-neutral-200'}`}
             >
-              Cinematic (High)
+              সর্বোচ্চ (সিনেমাটিক)
             </button>
           </div>
         </div>
@@ -330,10 +330,10 @@ export const RavanaCanvas: React.FC<RavanaCanvasProps> = ({ onInteraction }) => 
       <div className="p-4 bg-[#0a0a10] border border-neutral-900 rounded-xl">
         <div className="flex items-center justify-between mb-3 text-xs text-neutral-400">
           <span className="font-semibold text-neutral-300 tracking-wider font-cinzel">
-            TEN VICES PURGE PROGRESS ({explodedHeads.length}/10)
+            দশ রিপু বিনাশের অগ্রগতি ({explodedHeads.length}/১০)
           </span>
           <span className="text-[11px] text-amber-400/70">
-            Shri Rama’s arrow purges every aspect of pride
+            শ্রীরামের তীর অহংকারের প্রতিটি রূপকে বিনাশ করছে
           </span>
         </div>
 

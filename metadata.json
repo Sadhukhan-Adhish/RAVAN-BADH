@@ -1,6 +1,6 @@
 {
-  "name": "RAVANA DAHAN — The Night of Victory",
-  "description": "An immersive, cinematic Dussehra festival experience celebrating the triumph of light over darkness with interactive Ravana Dahan canvas simulation.",
+  "name": "রাবণ দহন — বিজয়ের রাত",
+  "description": "বিজয়াদশমীর বিশেষ আয়োজনে আলোর বিজয়ের গাথা এবং ইন্টারঅ্যাক্টিভ রাবণ দহন উৎসব।",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { TEN_VICES, FESTIVAL_PILLARS } from '../../data/dussehraData';
 import { ViceHead } from '../../types';
-import { Flame, Sparkles, Shield, ChevronRight } from 'lucide-react';
+import { Sparkles, Shield, ChevronRight } from 'lucide-react';
 
 export const StorySection: React.FC = () => {
   const [selectedVice, setSelectedVice] = useState<ViceHead>(TEN_VICES[4]); // Ahankara default
@@ -12,14 +12,14 @@ export const StorySection: React.FC = () => {
         
         {/* Main Editorial Story Header */}
         <div className="flex flex-col items-center text-center max-w-3xl mx-auto">
-          <div className="text-xs font-semibold tracking-[0.25em] text-amber-500 uppercase mb-3">
-            THE SACRED EPIC OF VIJAYADASHAMI
+          <div className="text-xs font-semibold tracking-[0.24em] text-amber-500 uppercase mb-3">
+            বিজয়াদশমীর পুণ্যকথা
           </div>
           <h2 className="font-cinzel text-3xl sm:text-4xl md:text-5xl font-bold tracking-wide text-white glow-gold mb-6 text-balance">
-            THE VICTORY OF GOOD OVER EVIL
+            অশুভ শক্তির বিনাশ, শুভের জয়
           </h2>
           <p className="text-neutral-300 text-base sm:text-lg leading-relaxed font-sans">
-            Dussehra, also revered as Vijayadashami, marks the tenth day of the bright half of the month of Ashwin. It commemorates the timeless triumph of Shri Rama over the demon king Ravana, symbolizing that no matter how mighty or learned arrogance becomes, it must ultimately bow before righteousness and truth.
+            বিজয়াদশমী আমাদের মনে করিয়ে দেয়—সত্য ও ন্যায়ের কাছে অন্যায় ও অশুভ শক্তির পরাজয় অবশ্যম্ভাবী। আশ্বিন মাসের শুক্লপক্ষের এই পুণ্য দশমী তিথিতে শ্রীরামচন্দ্র দশানন রাবণকে পরাজিত করে বিশ্বসংসারে আলো ও ধর্ম ফিরিয়ে এনেছিলেন।
           </p>
         </div>
 
@@ -29,17 +29,17 @@ export const StorySection: React.FC = () => {
           <div className="lg:col-span-6 relative rounded-2xl overflow-hidden border border-amber-900/40 shadow-2xl bg-black">
             <img
               src="/src/assets/images/divine_flaming_arrow_1792513652782.jpg"
-              alt="Divine archer drawing tight a golden bow with blazing fire arrow"
+              alt="দিব্য ধনুর্ধর শ্রীরামের কোদণ্ড ধনুকে প্রজ্বলিত অগ্নিবাণ"
               className="w-full h-[360px] sm:h-[460px] object-cover object-center"
               referrerPolicy="no-referrer"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#080810] via-transparent to-transparent" />
             <div className="absolute bottom-6 left-6 right-6">
               <div className="text-xs text-amber-400 font-cinzel tracking-wider uppercase mb-1">
-                The Kodanda Bow & Agneyastra
+                কোদণ্ড ধনুক ও আগ্নেয়াস্ত্র
               </div>
               <div className="text-white text-sm sm:text-base font-medium">
-                &ldquo;Aim not for the heads that multiply, but for the pride rooted within the navel.&rdquo;
+                &ldquo;যে মস্তক বারবার জন্মায় তাকে নয়, নাভিমূলে লুকানো অহংকারের উৎসে আঘাত করো।&rdquo;
               </div>
             </div>
           </div>
@@ -48,13 +48,13 @@ export const StorySection: React.FC = () => {
           <div className="lg:col-span-6 flex flex-col gap-6 text-neutral-300">
             <div className="space-y-4 text-base sm:text-lg leading-relaxed font-sans">
               <p>
-                Ravana was not a crude brute; he was a master of the four Vedas, an ardent devotee of Lord Shiva, and an architect of golden Lanka. Yet, unbridled hubris (<span className="text-amber-300 font-medium">Ahankara</span>) turned his profound wisdom into tyranny.
+                রাবণ কেবল এক পরাক্রমশালী রাজা ছিলেন না; তিনি ছিলেন চার বেদের বিশারদ, ভগবান শিবের একনিষ্ঠ ভক্ত এবং স্বর্ণলঙ্কার মহান স্থপতি। তবুও লাগামহীন অহংকার (<span className="text-amber-300 font-medium">দম্ভ</span>) তাঁর অগাধ বিদ্যা ও জ্ঞানকে অন্ধত্বে পরিণত করেছিল।
               </p>
               <p>
-                When Lord Rama severed Ravana’s heads in combat, another sprang immediately in its place—a metaphor for how cutting down individual worldly desires only breeds new cravings.
+                শ্রীরামচন্দ্র যখনই যুদ্ধে রাবণের কোনো মস্তক ছেদন করতেন, তখনই নতুন আরেকটি মস্তক গজিয়ে উঠত—যা আমাদের অন্তরের অতৃপ্ত অনন্ত কামনার রূপক।
               </p>
               <p>
-                It was only when the divine arrow, consecrated with the solar hymns of <span className="text-amber-300 font-medium">Aditya Hridayam</span>, struck the <span className="text-amber-300 font-medium">Amrit Kund</span> (the nectar reservoir of life in Ravana’s navel) that the illusion crumbled, freeing Lanka and restoring Dharma across creation.
+                অগস্ত্য মুনির <span className="text-amber-300 font-medium">আদিত্য হৃদয়ম্</span> স্তোত্রে শক্তি সঞ্চয় করে, বিভীষণের পরামর্শক্রমে শ্রীরাম যখন রাবণের নাভিস্থ <span className="text-amber-300 font-medium">অমৃত কুণ্ডে</span> ব্রহ্মাস্ত্র নিক্ষেপ করেন, তখনই সেই মায়াবী অহংকার চূর্ণ হয় এবং ধরণীতে পুনঃপ্রতিষ্ঠিত হয় শাশ্বত ধর্ম।
               </p>
             </div>
 
@@ -63,13 +63,13 @@ export const StorySection: React.FC = () => {
               <Shield className="w-5 h-5 text-amber-500 shrink-0 mt-1" />
               <div>
                 <div className="text-xs tracking-wider font-cinzel text-amber-400 uppercase mb-1">
-                  Eternal Sanskrit Proverb
+                  শাশ্বত সংস্কৃত বাণী
                 </div>
                 <div className="text-base text-white font-serif italic mb-1">
-                  &ldquo;Yato Dharmastato Jayah&rdquo;
+                  &ldquo;যতো ধর্মস্ততো জয়ঃ&rdquo;
                 </div>
                 <div className="text-xs text-neutral-400">
-                  Where there is Dharma (Righteousness), there alone is Victory.
+                  যেখানে ধর্ম ও ন্যায়, সেখানেই নিশ্চিত বিজয়।
                 </div>
               </div>
             </div>
@@ -103,13 +103,13 @@ export const StorySection: React.FC = () => {
         <div id="vices" className="flex flex-col gap-10 pt-12 border-t border-neutral-900">
           <div className="flex flex-col items-center text-center max-w-2xl mx-auto">
             <div className="text-xs font-semibold tracking-[0.22em] text-amber-500 uppercase mb-2">
-              INNER CONQUEST
+              অন্তরের সংগ্রাম
             </div>
             <h3 className="font-cinzel text-2xl sm:text-3xl md:text-4xl font-bold text-white glow-gold mb-3">
-              THE TEN HEADS OF RAVANA
+              রাবণের দশটি মস্তক ও দশ রিপু
             </h3>
             <p className="text-neutral-400 text-sm sm:text-base leading-relaxed">
-              In Indian spiritual philosophy, Ravana’s ten heads embody ten psychological and spiritual pitfalls that keep consciousness bound. Select any head to explore its esoteric lesson.
+              ভারতীয় আধ্যাত্মিক দর্শনে রাবণের দশটি মাথা মানব চেতনার দশটি অন্ধ মোহ ও রিপুর প্রতীক। যেকোনো একটি মাথায় ক্লিক করে তার গূঢ় অর্থ জানুন।
             </p>
           </div>
 
@@ -148,7 +148,7 @@ export const StorySection: React.FC = () => {
               <div>
                 <div className="flex items-center gap-2 text-xs font-semibold tracking-widest text-amber-400 uppercase mb-3">
                   <Sparkles className="w-4 h-4 text-amber-400" />
-                  <span>HEAD {selectedVice.id} OF 10</span>
+                  <span>১০টি রিপুর মধ্যে {selectedVice.id} নম্বর</span>
                 </div>
                 <h4 className="font-cinzel text-2xl font-bold text-white mb-1">
                   {selectedVice.sanskritName}
@@ -160,7 +160,7 @@ export const StorySection: React.FC = () => {
                 <div className="space-y-4">
                   <div>
                     <div className="text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-1">
-                      The Manifestation:
+                      লক্ষণ ও স্বরূপ:
                     </div>
                     <p className="text-sm text-neutral-200 leading-relaxed font-sans">
                       {selectedVice.meaning}
@@ -169,7 +169,7 @@ export const StorySection: React.FC = () => {
 
                   <div>
                     <div className="text-xs font-semibold uppercase tracking-wider text-amber-400/90 mb-1">
-                      The Dharmic Antidote:
+                      মুক্তির পথ ও ধর্মাচরণ:
                     </div>
                     <p className="text-sm text-amber-200/90 leading-relaxed font-sans">
                       {selectedVice.spiritualRemedy}
@@ -179,8 +179,8 @@ export const StorySection: React.FC = () => {
               </div>
 
               <div className="mt-8 pt-4 border-t border-neutral-800/80 flex items-center justify-between text-xs text-neutral-400">
-                <span>Burned during Ravana Dahan</span>
-                <span className="text-amber-400 font-cinzel font-semibold">Vijayadashami</span>
+                <span>রাবণ দহনে যা ভস্মীভূত হয়</span>
+                <span className="text-amber-400 font-cinzel font-semibold">বিজয়াদশমী</span>
               </div>
             </div>
           </div>

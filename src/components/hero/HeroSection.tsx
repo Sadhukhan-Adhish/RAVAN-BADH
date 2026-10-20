@@ -81,7 +81,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onIgniteClick, onStory
       <div className="absolute inset-0 z-0">
         <img
           src="/src/assets/images/ravana_effigy_cinematic_1792513653084.jpg"
-          alt="Majestic towering multi-headed Ravana effigy at night during Dussehra festival"
+          alt="বিজয়াদশমী উৎসবে রাতের আঁধারে প্রজ্বলিত বহু-মস্তকবিশিষ্ট বিশাল রাবণের কুশপুতুল"
           className="w-full h-full object-cover object-center opacity-40 mix-blend-screen scale-105 transform motion-safe:animate-pulse [animation-duration:12s]"
         />
         {/* Layered radial gradient scrim for deep theatrical contrast */}
@@ -98,25 +98,25 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onIgniteClick, onStory
       {/* Hero Content Container */}
       <div className="relative z-10 max-w-4xl mx-auto flex flex-col items-center">
         {/* Small Label */}
-        <div className="inline-flex items-center gap-2 mb-6 text-xs md:text-sm font-semibold tracking-[0.28em] text-amber-400/90 uppercase">
+        <div className="inline-flex items-center gap-2 mb-6 text-xs md:text-sm font-semibold tracking-[0.24em] text-amber-400/90 uppercase">
           <span className="text-amber-500 font-bold">✦</span>
-          <span>A CELEBRATION OF VIJAYADASHAMI</span>
+          <span>বিজয়াদশমীর বিশেষ আয়োজন</span>
           <span className="text-amber-500 font-bold">✦</span>
         </div>
 
         {/* Main Heading: RAVANA DAHAN */}
-        <h1 className="font-cinzel text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-wider text-white drop-shadow-[0_10px_35px_rgba(255,87,34,0.35)] glow-fire mb-4 leading-none">
-          RAVANA DAHAN
+        <h1 className="font-cinzel text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-wider text-white drop-shadow-[0_10px_35px_rgba(255,87,34,0.35)] glow-fire mb-4 leading-tight">
+          রাবণ দহন
         </h1>
 
         {/* Subtitle */}
         <p className="font-cinzel text-xl sm:text-2xl md:text-3xl font-semibold text-amber-200/95 tracking-wide mb-6">
-          The Triumph of Light Over Darkness.
+          অশুভের বিনাশ, শুভ শক্তির জয়
         </p>
 
         {/* Cinematic Narrative Lead */}
         <p className="max-w-2xl text-neutral-300 text-base sm:text-lg leading-relaxed mb-10 font-sans">
-          On this sacred night of Vijayadashami, witness the burning of the ten-headed King of Lanka. As the divine Agneyastra pierces the vessel of ego, cosmic righteousness is restored across the three worlds.
+          বিজয়াদশমীর এই পুণ্যলগ্নে প্রত্যক্ষ করুন লঙ্কাপতি রাবণের দহন। শ্রীরামের দিব্য আগ্নেয়াস্ত্র যখন অহংকারের পাত্রকে বিদীর্ণ করে, তখন সমগ্র সৃষ্টিতে পুনর্বার প্রতিষ্ঠিত হয় সত্য ও ন্যায়ধর্ম।
         </p>
 
         {/* Call to Action Buttons */}
@@ -127,7 +127,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onIgniteClick, onStory
             className="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-amber-500 via-orange-600 to-amber-600 text-amber-950 font-cinzel font-bold text-sm sm:text-base tracking-widest hover:from-amber-400 hover:to-orange-500 active:scale-95 transition-all shadow-[0_0_30px_rgba(245,158,11,0.45)] flex items-center justify-center gap-3 cursor-pointer"
           >
             <Flame className="w-5 h-5 text-amber-950 fill-amber-950" />
-            <span>IGNITE THE LEGEND</span>
+            <span>অগ্নিবাণ ছোড়ো</span>
           </button>
 
           {/* Secondary CTA */}
@@ -136,26 +136,26 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onIgniteClick, onStory
             className="w-full sm:w-auto px-8 py-4 rounded-xl bg-neutral-900/80 hover:bg-neutral-800/90 border border-amber-600/30 text-amber-100 font-cinzel font-medium text-sm sm:text-base tracking-widest transition-all flex items-center justify-center gap-3 cursor-pointer backdrop-blur-sm"
           >
             <BookOpen className="w-5 h-5 text-amber-400" />
-            <span>DISCOVER THE STORY</span>
+            <span>পৌরাণিক কথা </span>
           </button>
         </div>
 
         {/* Editorial Trust / Cultural Anchor Strip */}
         <div className="mt-16 pt-8 border-t border-amber-950/40 flex flex-wrap items-center justify-center gap-6 sm:gap-12 text-xs text-neutral-400 tracking-wider">
           <div className="flex items-center gap-2">
-            <span className="text-amber-500">10 Heads</span>
+            <span className="text-amber-500">১০টি মস্তক</span>
             <span className="opacity-40">·</span>
-            <span>Ten Human Vices Burned</span>
+            <span>ভেতরের দশটি রিপু দহন</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-amber-500">Agneyastra</span>
+            <span className="text-amber-500">আগ্নেয়াস্ত্র</span>
             <span className="opacity-40">·</span>
-            <span>The Divine Arrow of Truth</span>
+            <span>সত্যের দিব্য বাণ</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-amber-500">Dharma</span>
+            <span className="text-amber-500">ধর্ম</span>
             <span className="opacity-40">·</span>
-            <span>Eternal Cosmic Balance</span>
+            <span>শাশ্বত শুভ শক্তির জয়</span>
           </div>
         </div>
       </div>
@@ -163,7 +163,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onIgniteClick, onStory
       {/* Down arrow scroll cue */}
       <button 
         onClick={onIgniteClick}
-        aria-label="Scroll to interactive animation"
+        aria-label="ইন্টারঅ্যাক্টিভ অ্যানিমেশনে যান"
         className="absolute bottom-6 left-1/2 -translate-x-1/2 text-amber-400/60 hover:text-amber-300 transition-colors animate-bounce p-2 cursor-pointer"
       >
         <ChevronDown className="w-6 h-6" />
