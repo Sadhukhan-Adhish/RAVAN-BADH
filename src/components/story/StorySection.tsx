@@ -24,28 +24,11 @@ export const StorySection: React.FC = () => {
         </div>
 
         {/* Feature Split: The Divine Agneyastra & The Secret of Amrit Kund */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-          {/* Artwork Card */}
-          <div className="lg:col-span-6 relative rounded-2xl overflow-hidden border border-amber-900/40 shadow-2xl bg-black">
-            <img
-              src="/src/assets/images/divine_flaming_arrow_1792513652782.jpg"
-              alt="দিব্য ধনুর্ধর শ্রীরামের কোদণ্ড ধনুকে প্রজ্বলিত অগ্নিবাণ"
-              className="w-full h-[360px] sm:h-[460px] lg:h-[460px] object-cover object-[60%_center] sm:object-center"
-              referrerPolicy="no-referrer"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#080810] via-transparent to-transparent" />
-            <div className="absolute bottom-6 left-6 right-6">
-              <div className="text-xs text-amber-400 font-cinzel tracking-wider uppercase mb-1">
-                কোদণ্ড ধনুক ও আগ্নেয়াস্ত্র
-              </div>
-              <div className="text-white text-sm sm:text-base font-medium">
-                &ldquo;যে মস্তক বারবার জন্মায় তাকে নয়, নাভিমূলে লুকানো অহংকারের উৎসে আঘাত করো।&rdquo;
-              </div>
-            </div>
-          </div>
+        <div className="grid grid-cols-1 gap-10 items-center">
+        
 
           {/* Narrative Text */}
-          <div className="lg:col-span-6 flex flex-col gap-6 text-neutral-300">
+          <div className="w-full flex flex-col gap-6 text-neutral-300">
             <div className="space-y-4 text-base sm:text-lg leading-relaxed font-sans">
               <p>
                 রাবণ কেবল এক পরাক্রমশালী রাজা ছিলেন না; তিনি ছিলেন চার বেদের বিশারদ, ভগবান শিবের একনিষ্ঠ ভক্ত এবং স্বর্ণলঙ্কার মহান স্থপতি। তবুও লাগামহীন অহংকার (<span className="text-amber-300 font-medium">দম্ভ</span>) তাঁর অগাধ বিদ্যা ও জ্ঞানকে অন্ধত্বে পরিণত করেছিল।
