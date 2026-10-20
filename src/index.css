@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+@theme {
+  --font-cinzel: 'Cinzel', serif;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --color-midnight: #060609;
+  --color-charcoal: #111118;
+  --color-fire-orange: #ff5722;
+  --color-fire-amber: #f59e0b;
+  --color-sacred-gold: #fbbf24;
+}
+
+@layer base {
+  body {
+    font-family: var(--font-sans);
+    background-color: #060609;
+    color: #f7f3ea;
+  }
+}
+
+.font-cinzel {
+  font-family: var(--font-cinzel);
+}
+
+/* Custom glow utilities */
+.glow-fire {
+  text-shadow: 0 0 25px rgba(255, 87, 34, 0.65), 0 0 50px rgba(245, 158, 11, 0.4);
+}
+
+.glow-gold {
+  text-shadow: 0 0 20px rgba(251, 191, 36, 0.5), 0 0 40px rgba(217, 119, 6, 0.3);
+}
+
+.box-glow-fire {
+  box-shadow: 0 0 40px -10px rgba(255, 87, 34, 0.35), 0 0 20px -5px rgba(245, 158, 11, 0.25);
+}
+
+.box-glow-gold {
+  box-shadow: 0 0 35px -5px rgba(251, 191, 36, 0.25);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #08080d;
+}
+::-webkit-scrollbar-thumb {
+  background: #272733;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #f59e0b;
+}

@@ -1,0 +1,359 @@
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { 
+  Play, 
+  Pause, 
+  RotateCcw, 
+  Volume2, 
+  VolumeX, 
+  Flame, 
+  Sparkles, 
+  Zap,
+  Crosshair,
+  Info
+} from 'lucide-react';
+import { CanvasEngine } from './CanvasEngine';
+import { AnimationStatus } from '../../types';
+import { soundSynth } from '../../utils/audioSynthesizer';
+import { TEN_VICES } from '../../data/dussehraData';
+
+interface RavanaCanvasProps {
+  onInteraction?: () => void;
+}
+
+export const RavanaCanvas: React.FC<RavanaCanvasProps> = ({ onInteraction }) => {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const engineRef = useRef<CanvasEngine | null>(null);
+
+  const [status, setStatus] = useState<AnimationStatus>('idle');
+  const [isPaused, setIsPaused] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [speed, setSpeed] = useState<number>(1.0);
+  const [particleDensity, setParticleDensity] = useState<'standard' | 'cinematic'>('cinematic');
+  const [explodedHeads, setExplodedHeads] = useState<number[]>([]);
+  const [activeHeadInfo, setActiveHeadInfo] = useState<string | null>(null);
+
+  // Initialize CanvasEngine
+  useEffect(() => {
+    const engine = new CanvasEngine();
+    engineRef.current = engine;
+
+    engine.setStatusCallback((newStatus) => {
+      setStatus(newStatus);
+      if (newStatus === 'idle') {
+        setExplodedHeads([]);
+        setActiveHeadInfo(null);
+      }
+    });
+
+    engine.setHeadExplodeCallback((headIndex) => {
+      setExplodedHeads((prev) => [...prev, headIndex]);
+      const vice = TEN_VICES[headIndex];
+      if (vice) {
+        setActiveHeadInfo(`Purging: ${vice.sanskritName} — ${vice.englishName}`);
+      }
+    });
+
+    if (canvasRef.current) {
+      engine.mount(canvasRef.current);
+    }
+
+    // ResizeObserver for rock-solid responsive container scaling
+    const resizeObserver = new ResizeObserver(() => {
+      engine.handleResize();
+    });
+
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
+
+    // Accessibility check: reduced motion
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) {
+      engine.setParticleDensity('standard');
+      setParticleDensity('standard');
+    }
+
+    return () => {
+      resizeObserver.disconnect();
+      engine.unmount();
+    };
+  }, []);
+
+  // Update sound state
+  const toggleSound = useCallback(() => {
+    const next = !isMuted;
+    setIsMuted(next);
+    soundSynth.setMuted(next);
+  }, [isMuted]);
+
+  // Handle Play/Pause
+  const togglePlayPause = useCallback(() => {
+    if (!engineRef.current) return;
+    engineRef.current.togglePlayPause();
+    setIsPaused((prev) => !prev);
+  }, []);
+
+  // Launch Divine Arrow
+  const handleLaunchArrow = useCallback(() => {
+    if (!engineRef.current) return;
+    onInteraction?.();
+    engineRef.current.launchArrow();
+  }, [onInteraction]);
+
+  // Aim Bow
+  const handleAim = useCallback(() => {
+    if (!engineRef.current) return;
+    onInteraction?.();
+    engineRef.current.startAiming();
+  }, [onInteraction]);
+
+  // Reset
+  const handleReset = useCallback(() => {
+    if (!engineRef.current) return;
+    engineRef.current.reset();
+    setExplodedHeads([]);
+    setActiveHeadInfo(null);
+    setIsPaused(false);
+  }, []);
+
+  // Change speed
+  const handleSpeedChange = useCallback((newSpeed: number) => {
+    setSpeed(newSpeed);
+    engineRef.current?.setSpeed(newSpeed);
+  }, []);
+
+  // Change particle quality
+  const handleDensityChange = useCallback((density: 'standard' | 'cinematic') => {
+    setParticleDensity(density);
+    engineRef.current?.setParticleDensity(density);
+  }, []);
+
+  // Canvas click interaction
+  const handleCanvasClick = useCallback(() => {
+    if (status === 'idle' || status === 'aiming') {
+      handleLaunchArrow();
+    } else if (status === 'concluded') {
+      handleReset();
+    }
+  }, [status, handleLaunchArrow, handleReset]);
+
+  // Status badge text
+  const getStatusDisplay = () => {
+    switch (status) {
+      case 'idle':
+        return { label: 'Effigy Poised', desc: 'Click to loose the Agneyastra arrow' };
+      case 'aiming':
+        return { label: 'Bow Drawn', desc: 'Aligning with the sacred Amrit Kund' };
+      case 'flying':
+        return { label: 'Arrow in Flight', desc: 'Brahmashira soaring across the twilight' };
+      case 'impact':
+        return { label: 'Amrit Kund Pierced', desc: 'Divine strike dissolves the vessel of hubris' };
+      case 'burning':
+        return { label: 'Sacred Agni Roars', desc: 'Flame spreads through bamboo and gold robes' };
+      case 'exploding':
+        return { label: 'Effigy Conflagration', desc: 'Ten heads bursting into radiant firecrackers' };
+      case 'concluded':
+        return { label: 'Dharma Victorious', desc: 'The effigy turns to sacred ash; light prevails' };
+      default:
+        return { label: 'Standing Tall', desc: '' };
+    }
+  };
+
+  const statusInfo = getStatusDisplay();
+
+  return (
+    <div className="w-full max-w-6xl mx-auto flex flex-col gap-6">
+      {/* Top stage status bar */}
+      <div className="flex flex-wrap items-center justify-between gap-4 px-4 py-3 bg-[#111119] border border-amber-950/40 rounded-xl">
+        <div className="flex items-center gap-3">
+          <div className="w-3 h-3 rounded-full bg-amber-500 shadow-[0_0_12px_#f59e0b]" />
+          <div>
+            <div className="text-sm font-semibold tracking-wide text-amber-200">
+              {statusInfo.label}
+            </div>
+            <div className="text-xs text-amber-400/70">
+              {statusInfo.desc}
+            </div>
+          </div>
+        </div>
+
+        {/* Dynamic active purge notification */}
+        {activeHeadInfo && (
+          <div className="text-xs font-medium text-amber-300/90 bg-amber-950/40 px-3 py-1.5 rounded-lg border border-amber-800/30">
+            {activeHeadInfo}
+          </div>
+        )}
+
+        {/* Quick controls: Audio & Speed */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={toggleSound}
+            aria-label={isMuted ? 'Unmute festival sounds' : 'Mute festival sounds'}
+            className="p-2 rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-amber-400 hover:border-amber-700/50 transition-colors cursor-pointer"
+            title={isMuted ? 'Unmute synthesized audio' : 'Mute audio'}
+          >
+            {isMuted ? <VolumeX className="w-4 h-4 text-red-400" /> : <Volume2 className="w-4 h-4 text-amber-400" />}
+          </button>
+
+          {/* Speed selector */}
+          <div className="flex items-center bg-neutral-900 border border-neutral-800 rounded-lg p-0.5 text-xs text-neutral-400">
+            <button
+              onClick={() => handleSpeedChange(0.5)}
+              className={`px-2 py-1 rounded transition-colors cursor-pointer ${speed === 0.5 ? 'bg-amber-500/20 text-amber-300 font-semibold' : 'hover:text-neutral-200'}`}
+            >
+              0.5x
+            </button>
+            <button
+              onClick={() => handleSpeedChange(1.0)}
+              className={`px-2 py-1 rounded transition-colors cursor-pointer ${speed === 1.0 ? 'bg-amber-500/20 text-amber-300 font-semibold' : 'hover:text-neutral-200'}`}
+            >
+              1.0x
+            </button>
+            <button
+              onClick={() => handleSpeedChange(1.5)}
+              className={`px-2 py-1 rounded transition-colors cursor-pointer ${speed === 1.5 ? 'bg-amber-500/20 text-amber-300 font-semibold' : 'hover:text-neutral-200'}`}
+            >
+              1.5x
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Interactive Stage Canvas Container */}
+      <div 
+        ref={containerRef}
+        onClick={handleCanvasClick}
+        className="relative w-full aspect-[16/10] sm:aspect-[16/9] md:aspect-[21/10] min-h-[380px] max-h-[640px] bg-[#07070c] rounded-2xl border border-amber-900/30 overflow-hidden shadow-2xl shadow-black/80 cursor-crosshair group select-none"
+      >
+        <canvas
+          ref={canvasRef}
+          className="w-full h-full block"
+        />
+
+        {/* Interactive Click to Launch Hint Overlay */}
+        {status === 'idle' && (
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full bg-black/60 backdrop-blur-md border border-amber-500/30 text-amber-200 text-xs font-medium tracking-wide flex items-center gap-2 pointer-events-none opacity-90 transition-opacity">
+            <Crosshair className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+            <span>Click canvas or press &ldquo;Release Agneyastra&rdquo; to ignite</span>
+          </div>
+        )}
+
+        {/* Victory Banner Overlay */}
+        {status === 'concluded' && (
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex flex-col items-center justify-center p-6 text-center animate-fade-in pointer-events-none">
+            <div className="text-amber-400 text-xs font-semibold tracking-[0.25em] uppercase mb-2">
+              Cosmic Order Restored
+            </div>
+            <div className="font-cinzel text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-wider glow-fire mb-3">
+              DHARMASYA JAYAH
+            </div>
+            <p className="text-neutral-300 text-sm max-w-md font-sans leading-relaxed">
+              The ten vices dissolve in celestial flames. Truth, righteousness, and humility reign eternal.
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Primary Interaction Action Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-[#0d0d14] border border-neutral-800/80 rounded-2xl">
+        {/* Left: Main Action Triggers */}
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            onClick={handleLaunchArrow}
+            disabled={status === 'flying' || status === 'burning' || status === 'exploding'}
+            className="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-600 via-orange-600 to-amber-500 text-white font-cinzel font-semibold text-sm tracking-wider shadow-lg shadow-orange-900/40 hover:from-amber-500 hover:to-orange-500 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2.5 cursor-pointer"
+          >
+            <Flame className="w-4 h-4 text-amber-200" />
+            <span>RELEASE AGNEYASTRA</span>
+          </button>
+
+          <button
+            onClick={handleAim}
+            disabled={status !== 'idle' && status !== 'concluded'}
+            className="px-4 py-3 rounded-xl bg-neutral-900 border border-neutral-700 text-neutral-300 hover:text-white hover:border-amber-600/60 font-medium text-xs tracking-wider transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
+          >
+            <Crosshair className="w-3.5 h-3.5 text-amber-400" />
+            <span>DRAW BOW</span>
+          </button>
+
+          <button
+            onClick={handleReset}
+            className="px-4 py-3 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-amber-300 hover:border-neutral-700 font-medium text-xs tracking-wider transition-colors flex items-center gap-2 cursor-pointer"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            <span>RESET EFFIGY</span>
+          </button>
+
+          <button
+            onClick={togglePlayPause}
+            disabled={status === 'idle' || status === 'concluded'}
+            className="p-3 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-white transition-colors disabled:opacity-40 cursor-pointer"
+            aria-label={isPaused ? 'Resume simulation' : 'Pause simulation'}
+          >
+            {isPaused ? <Play className="w-4 h-4 text-emerald-400" /> : <Pause className="w-4 h-4" />}
+          </button>
+        </div>
+
+        {/* Right: Particle Density Mode */}
+        <div className="flex items-center gap-3 text-xs text-neutral-400">
+          <span className="hidden sm:inline">Spark Density:</span>
+          <div className="flex items-center bg-neutral-900 border border-neutral-800 rounded-lg p-0.5">
+            <button
+              onClick={() => handleDensityChange('standard')}
+              className={`px-3 py-1.5 rounded transition-colors cursor-pointer ${particleDensity === 'standard' ? 'bg-amber-500/20 text-amber-300 font-semibold' : 'text-neutral-400 hover:text-neutral-200'}`}
+            >
+              Standard
+            </button>
+            <button
+              onClick={() => handleDensityChange('cinematic')}
+              className={`px-3 py-1.5 rounded transition-colors cursor-pointer ${particleDensity === 'cinematic' ? 'bg-amber-500/20 text-amber-300 font-semibold' : 'text-neutral-400 hover:text-neutral-200'}`}
+            >
+              Cinematic (High)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Ten Heads Purge Tracker Matrix */}
+      <div className="p-4 bg-[#0a0a10] border border-neutral-900 rounded-xl">
+        <div className="flex items-center justify-between mb-3 text-xs text-neutral-400">
+          <span className="font-semibold text-neutral-300 tracking-wider font-cinzel">
+            TEN VICES PURGE PROGRESS ({explodedHeads.length}/10)
+          </span>
+          <span className="text-[11px] text-amber-400/70">
+            Shri Rama’s arrow purges every aspect of pride
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+          {TEN_VICES.map((vice, idx) => {
+            const isPurged = explodedHeads.includes(idx);
+            return (
+              <div
+                key={vice.id}
+                className={`p-2.5 rounded-lg border text-xs transition-all ${
+                  isPurged
+                    ? 'bg-amber-950/20 border-amber-600/40 text-amber-200'
+                    : 'bg-[#12121c] border-neutral-800/80 text-neutral-500'
+                }`}
+              >
+                <div className="flex items-center justify-between gap-1 mb-1">
+                  <span className={`font-semibold truncate ${isPurged ? 'text-amber-300' : 'text-neutral-400'}`}>
+                    {vice.sanskritName.split(' ')[0]}
+                  </span>
+                  {isPurged && (
+                    <Sparkles className="w-3 h-3 text-amber-400 shrink-0" />
+                  )}
+                </div>
+                <div className="text-[11px] truncate opacity-80">
+                  {vice.englishName}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+};
