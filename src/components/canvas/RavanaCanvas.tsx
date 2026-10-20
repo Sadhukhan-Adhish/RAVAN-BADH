@@ -55,6 +55,7 @@ export const RavanaCanvas: React.FC<RavanaCanvasProps> = ({ onInteraction }) => 
     if (canvasRef.current) {
       engine.mount(canvasRef.current);
     }
+    soundSynth.initCtx();
 
     // ResizeObserver for rock-solid responsive container scaling
     const resizeObserver = new ResizeObserver(() => {

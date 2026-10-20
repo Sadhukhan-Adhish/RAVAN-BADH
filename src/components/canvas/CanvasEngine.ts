@@ -71,6 +71,7 @@ export class CanvasEngine {
   private burnedHeads: boolean[] = new Array(10).fill(false);
   private headExplodeTimer: number = 0;
   private nextHeadToBurn: number = 0;
+  private hasPlayedFinalExplosion: boolean = false;
 
   // Particle systems
   private particles: Particle[] = [];
@@ -225,6 +226,7 @@ export class CanvasEngine {
     this.burnedHeads.fill(false);
     this.nextHeadToBurn = 0;
     this.headExplodeTimer = 0;
+    this.hasPlayedFinalExplosion = false;
     this.particles = [];
     this.shockwaves = [];
     this.fireworks = [];
@@ -329,6 +331,7 @@ export class CanvasEngine {
     // 3. Burn progression
     if (this.status === 'burning' || this.status === 'exploding') {
       this.burnProgress = Math.min(1.0, this.burnProgress + 0.12 * dt);
+      soundSynth.updateFireIntensity(this.burnProgress);
 
       // Spawn rising flames from navel and body
       const flameSpawnRate = Math.floor(6 * this.particleDensityMultiplier);
@@ -382,6 +385,10 @@ export class CanvasEngine {
 
         // Post-all-heads collapse and sky fireworks
         if (this.nextHeadToBurn >= 10 && this.burnProgress >= 0.95) {
+          if (!this.hasPlayedFinalExplosion) {
+            this.hasPlayedFinalExplosion = true;
+            soundSynth.playFinalExplosion();
+          }
           this.collapseProgress = Math.min(1.0, this.collapseProgress + 0.2 * dt);
           if (this.collapseProgress >= 1.0) {
             this.status = 'concluded';
@@ -494,8 +501,9 @@ export class CanvasEngine {
     const headX = this.effigyX + offset * (26 * this.effigyScale);
     const headY = this.effigyY - (offset === 0 ? 305 : 285) * this.effigyScale;
 
-    // Head cracker burst sound with pitch variation
-    soundSynth.playFirecrackerBurst((index % 5) * 40);
+    // Head cracker burst sound with pitch variation and realistic spatial panning
+    const pan = Math.max(-0.85, Math.min(0.85, offset / 4.5));
+    soundSynth.playHeadExplosion(index, pan);
 
     // Crackers exploding from head
     const colors = ['#f59e0b', '#ef4444', '#10b981', '#38bdf8', '#fbbf24', '#e11d48'];
@@ -536,7 +544,8 @@ export class CanvasEngine {
     const colors = ['#fbbf24', '#ef4444', '#22c55e', '#a855f7', '#38bdf8', '#f97316'];
     const color = colors[Math.floor(Math.random() * colors.length)];
 
-    soundSynth.playFirecrackerBurst(120);
+    const skyPan = (fwX / this.width) * 1.6 - 0.8;
+    soundSynth.playSkyFirework(skyPan);
 
     const count = Math.floor(60 * this.particleDensityMultiplier);
     for (let i = 0; i < count; i++) {
