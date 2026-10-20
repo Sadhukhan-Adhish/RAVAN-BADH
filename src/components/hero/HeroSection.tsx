@@ -127,7 +127,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onIgniteClick, onStory
             className="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-amber-500 via-orange-600 to-amber-600 text-amber-950 font-cinzel font-bold text-sm sm:text-base tracking-widest hover:from-amber-400 hover:to-orange-500 active:scale-95 transition-all shadow-[0_0_30px_rgba(245,158,11,0.45)] flex items-center justify-center gap-3 cursor-pointer"
           >
             <Flame className="w-5 h-5 text-amber-950 fill-amber-950" />
-            <span>অগ্নিবাণ ছোড়ো</span>
+            <span>রাবণ বধ</span>
           </button>
 
           {/* Secondary CTA */}

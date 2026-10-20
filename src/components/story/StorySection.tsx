@@ -16,7 +16,7 @@ export const StorySection: React.FC = () => {
             বিজয়াদশমীর পুণ্যকথা
           </div>
           <h2 className="font-cinzel text-3xl sm:text-4xl md:text-5xl font-bold tracking-wide text-white glow-gold mb-6 text-balance">
-            অশুভ শক্তির বিনাশ, শুভের জয়
+            অশুভ শক্তির বিনাশ, শুভ শক্তির জয়
           </h2>
           <p className="text-neutral-300 text-base sm:text-lg leading-relaxed font-sans">
             বিজয়াদশমী আমাদের মনে করিয়ে দেয়—সত্য ও ন্যায়ের কাছে অন্যায় ও অশুভ শক্তির পরাজয় অবশ্যম্ভাবী। আশ্বিন মাসের শুক্লপক্ষের এই পুণ্য দশমী তিথিতে শ্রীরামচন্দ্র দশানন রাবণকে পরাজিত করে বিশ্বসংসারে আলো ও ধর্ম ফিরিয়ে এনেছিলেন।
@@ -30,7 +30,7 @@ export const StorySection: React.FC = () => {
             <img
               src="/src/assets/images/divine_flaming_arrow_1792513652782.jpg"
               alt="দিব্য ধনুর্ধর শ্রীরামের কোদণ্ড ধনুকে প্রজ্বলিত অগ্নিবাণ"
-              className="w-full h-[360px] sm:h-[460px] object-cover object-center"
+              className="w-full h-[360px] sm:h-[460px] lg:h-[460px] object-cover object-[60%_center] sm:object-center"
               referrerPolicy="no-referrer"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#080810] via-transparent to-transparent" />

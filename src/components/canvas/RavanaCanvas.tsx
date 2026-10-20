@@ -2,14 +2,11 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { 
   Play, 
   Pause, 
-  RotateCcw, 
   Volume2, 
   VolumeX, 
   Flame, 
   Sparkles, 
-  Zap,
-  Crosshair,
-  Info
+  Crosshair
 } from 'lucide-react';
 import { CanvasEngine } from './CanvasEngine';
 import { AnimationStatus } from '../../types';
@@ -24,6 +21,7 @@ export const RavanaCanvas: React.FC<RavanaCanvasProps> = ({ onInteraction }) => 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const engineRef = useRef<CanvasEngine | null>(null);
+  const autoResetTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const [status, setStatus] = useState<AnimationStatus>('idle');
   const [isPaused, setIsPaused] = useState(false);
@@ -96,6 +94,10 @@ export const RavanaCanvas: React.FC<RavanaCanvasProps> = ({ onInteraction }) => 
 
   // Launch Divine Arrow
   const handleLaunchArrow = useCallback(() => {
+    if (autoResetTimerRef.current) {
+      clearTimeout(autoResetTimerRef.current);
+      autoResetTimerRef.current = null;
+    }
     if (!engineRef.current) return;
     onInteraction?.();
     engineRef.current.launchArrow();
@@ -103,6 +105,10 @@ export const RavanaCanvas: React.FC<RavanaCanvasProps> = ({ onInteraction }) => 
 
   // Aim Bow
   const handleAim = useCallback(() => {
+    if (autoResetTimerRef.current) {
+      clearTimeout(autoResetTimerRef.current);
+      autoResetTimerRef.current = null;
+    }
     if (!engineRef.current) return;
     onInteraction?.();
     engineRef.current.startAiming();
@@ -110,12 +116,39 @@ export const RavanaCanvas: React.FC<RavanaCanvasProps> = ({ onInteraction }) => 
 
   // Reset
   const handleReset = useCallback(() => {
+    if (autoResetTimerRef.current) {
+      clearTimeout(autoResetTimerRef.current);
+      autoResetTimerRef.current = null;
+    }
     if (!engineRef.current) return;
     engineRef.current.reset();
     setExplodedHeads([]);
     setActiveHeadInfo(null);
     setIsPaused(false);
   }, []);
+
+  // Automatic reset after 3 seconds when animation concludes
+  useEffect(() => {
+    if (status === 'concluded') {
+      if (autoResetTimerRef.current) {
+        clearTimeout(autoResetTimerRef.current);
+      }
+      autoResetTimerRef.current = setTimeout(() => {
+        handleReset();
+      }, 3000);
+    } else {
+      if (autoResetTimerRef.current) {
+        clearTimeout(autoResetTimerRef.current);
+        autoResetTimerRef.current = null;
+      }
+    }
+
+    return () => {
+      if (autoResetTimerRef.current) {
+        clearTimeout(autoResetTimerRef.current);
+      }
+    };
+  }, [status, handleReset]);
 
   // Change speed
   const handleSpeedChange = useCallback((newSpeed: number) => {
@@ -244,9 +277,11 @@ export const RavanaCanvas: React.FC<RavanaCanvasProps> = ({ onInteraction }) => 
 
         {/* Interactive Click to Launch Hint Overlay */}
         {status === 'idle' && (
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full bg-black/60 backdrop-blur-md border border-amber-500/30 text-amber-200 text-xs font-medium tracking-wide flex items-center gap-2 pointer-events-none opacity-90 transition-opacity whitespace-nowrap">
-            <Crosshair className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
-            <span>অগ্নিবাণ ছুড়তে ক্যানভাসে বা &ldquo;অগ্নিবাণ ছোড়ো&rdquo; বোতামে ক্লিক করুন</span>
+          <div className="absolute bottom-3 sm:bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-1rem)] sm:w-auto sm:max-w-[90%] px-3 sm:px-4 py-2 rounded-xl sm:rounded-full bg-black/70 backdrop-blur-md border border-amber-500/30 text-amber-200 text-[11px] sm:text-xs font-medium tracking-normal sm:tracking-wide flex items-start sm:items-center justify-center gap-2 pointer-events-none opacity-90 transition-opacity text-center">
+            <Crosshair className="w-3.5 h-3.5 text-amber-400 animate-pulse shrink-0 mt-0.5 sm:mt-0" />
+            <span className="min-w-0 whitespace-normal break-words leading-relaxed">
+              অগ্নিবাণ ছুড়তে ক্যানভাসে বা &ldquo;অগ্নিবাণ ছোড়ো&rdquo; বোতামে ক্লিক করুন
+            </span>
           </div>
         )}
 
@@ -286,14 +321,6 @@ export const RavanaCanvas: React.FC<RavanaCanvasProps> = ({ onInteraction }) => 
           >
             <Crosshair className="w-3.5 h-3.5 text-amber-400" />
             <span>ধনুক তোলো</span>
-          </button>
-
-          <button
-            onClick={handleReset}
-            className="px-4 py-3 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-amber-300 hover:border-neutral-700 font-medium text-xs tracking-wider transition-colors flex items-center gap-2 cursor-pointer"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-            <span>পুনরায় সাজাও</span>
           </button>
 
           <button

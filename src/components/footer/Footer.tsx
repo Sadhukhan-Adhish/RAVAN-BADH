@@ -46,7 +46,7 @@ export const Footer: React.FC = () => {
             className="hover:text-amber-300 transition-colors flex items-center gap-1 cursor-pointer"
             aria-label="পৃষ্ঠার শীর্ষে ফিরে যান"
           >
-            <span>উপরে উঠুন</span>
+            <span>শীর্ষে ফিরুন</span>
             <ArrowUp className="w-3.5 h-3.5" />
           </button>
         </div>
